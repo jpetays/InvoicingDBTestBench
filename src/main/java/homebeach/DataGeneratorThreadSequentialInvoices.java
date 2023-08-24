@@ -1,3 +1,5 @@
+package homebeach;
+
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.GraphDatabase;
 import org.neo4j.driver.Session;
