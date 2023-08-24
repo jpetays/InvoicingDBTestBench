@@ -12,7 +12,7 @@ public abstract class Config {
     public static HashMap<String, String> neo4j_settings;
 
     static {
-        db_mariadb_url = "jdbc:mariadb://127.0.0.1:3306/";
+        db_mariadb_url = "jdbc:mariadb://localhost:3306/";
 
         sql_databases = new HashMap<>(
                 Map.ofEntries(
