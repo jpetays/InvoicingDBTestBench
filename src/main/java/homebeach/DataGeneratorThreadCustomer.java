@@ -1,5 +1,8 @@
 package homebeach;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.GraphDatabase;
 import org.neo4j.driver.Session;
@@ -13,6 +16,8 @@ import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class DataGeneratorThreadCustomer extends Thread {
+
+    private static final Logger logger = LoggerFactory.getLogger(DataGeneratorThreadCustomer.class);
 
     private HashMap<String, String[]> sql_databases;
 
@@ -175,7 +180,7 @@ public class DataGeneratorThreadCustomer extends Thread {
         int i = 0;
         int j = 0;
 
-        System.out.println("Thread: " + threadIndex + " customerIndex: " + customerIndex);
+        logger.trace("Thread: " + threadIndex + " customerIndex: " + customerIndex);
 
         setIndexes(customerIndex);
 
@@ -395,8 +400,8 @@ public class DataGeneratorThreadCustomer extends Thread {
 
             workIndexes = getWorkIndexes(invoiceIndex);
 
-            //System.out.println("workIndexes for invoice: " + invoiceIndex);
-            //System.out.println(workIndexes.toString());
+            //logger.trace("workIndexes for invoice: " + invoiceIndex);
+            //logger.trace(workIndexes.toString());
 
             j = 0;
             while (j < workIndexes.size()) {

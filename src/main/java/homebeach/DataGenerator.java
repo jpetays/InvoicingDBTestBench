@@ -1,5 +1,8 @@
 package homebeach;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.GraphDatabase;
 import org.neo4j.driver.Session;
@@ -18,6 +21,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class DataGenerator {
+
+    private static final Logger logger = LoggerFactory.getLogger(DataGenerator.class);
 
     private HashMap<String, String[]> sql_databases;
 
@@ -56,10 +61,10 @@ public class DataGenerator {
 
 
         } catch (SQLException e) {
-            System.out.println("SQLException");
+            logger.debug("SQLException");
             e.printStackTrace();
         } catch (Exception e) {
-            System.out.println("Exception");
+            logger.debug("Exception");
             e.printStackTrace();
         } finally {
 
@@ -68,7 +73,7 @@ public class DataGenerator {
                     conn.close();
                 }
             } catch (SQLException se) {
-                System.out.println("SQLException");
+                logger.debug("SQLException");
                 se.printStackTrace();
             }
             try {
@@ -76,7 +81,7 @@ public class DataGenerator {
                     conn.close();
                 }
             } catch (SQLException se) {
-                System.out.println("SQLException");
+                logger.debug("SQLException");
                 se.printStackTrace();
             }
         }
@@ -430,9 +435,9 @@ public class DataGenerator {
 
     public void printSampleDataSizes() {
 
-        System.out.println("Firstnames size: " + firstnames.size());
-        System.out.println("Surnames size: " + surnames.size());
-        System.out.println("Addresses size: " + addresses.size());
+        logger.debug("Firstnames size: " + firstnames.size());
+        logger.debug("Surnames size: " + surnames.size());
+        logger.debug("Addresses size: " + addresses.size());
 
     }
 
@@ -1163,7 +1168,7 @@ public class DataGenerator {
 
             ReentrantLock lock = new ReentrantLock();
 
-            System.out.println("Insertion of Customer related data started at: " + startTime.toString());
+            logger.debug("Insertion of Customer related data started at: " + startTime.toString());
 
             for (int i = 0; i < threadCount; i++) {
                 DataGeneratorThreadCustomer thread = new DataGeneratorThreadCustomer(i, iterationsPerThread, batchExecuteValue, sql_databases, neo4j_settings, lock, invoiceFactor, targetFactor, workFactor, sequentialInvoices, firstnames, surnames, addresses, customerIndex, invoiceIndex, targetIndex, workCount);
@@ -1185,8 +1190,8 @@ public class DataGenerator {
 
             String elapsedTime = (new SimpleDateFormat("mm:ss")).format(new Date(elapsedTimeMilliseconds));
 
-            System.out.println("Insertion of Customer related data finished at: " + endTime.toString());
-            System.out.println("Time elapsed: " + elapsedTime);
+            logger.debug("Insertion of Customer related data finished at: " + endTime.toString());
+            logger.debug("Time elapsed: " + elapsedTime);
 
 
         } catch (Exception e) {
@@ -1218,7 +1223,7 @@ public class DataGenerator {
 
             ReentrantLock lock = new ReentrantLock();
 
-            System.out.println("Insertion of sequential invoices started at: " + startTime.toString());
+            logger.debug("Insertion of sequential invoices started at: " + startTime.toString());
 
             String name = firstnames.get(0) + " " + surnames.get(0);
 
@@ -1283,8 +1288,8 @@ public class DataGenerator {
 
             String elapsedTime = (new SimpleDateFormat("mm:ss")).format(new Date(elapsedTimeMilliseconds));
 
-            System.out.println("Insertion of sequential invoices finished at: " + endTime.toString());
-            System.out.println("Time elapsed: " + elapsedTime);
+            logger.debug("Insertion of sequential invoices finished at: " + endTime.toString());
+            logger.debug("Time elapsed: " + elapsedTime);
 
 
         } catch (Exception e) {
@@ -1321,7 +1326,7 @@ public class DataGenerator {
 
             ReentrantLock lock = new ReentrantLock();
 
-            System.out.println("Insertion of Work related data started at: " + startTime.toString());
+            logger.debug("Insertion of Work related data started at: " + startTime.toString());
 
             for (int i = 0; i < threadCount; i++) {
 
@@ -1343,8 +1348,8 @@ public class DataGenerator {
 
             String elapsedTime = (new SimpleDateFormat("mm:ss")).format(new Date(elapsedTimeMilliseconds));
 
-            System.out.println("Insertion of Work related data finished at: " + endTime.toString());
-            System.out.println("Time elapsed: " + elapsedTime);
+            logger.debug("Insertion of Work related data finished at: " + endTime.toString());
+            logger.debug("Time elapsed: " + elapsedTime);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -1380,7 +1385,7 @@ public class DataGenerator {
 
             ReentrantLock lock = new ReentrantLock();
 
-            System.out.println("Insertion of items and work types started at: " + startTime.toString());
+            logger.debug("Insertion of items and work types started at: " + startTime.toString());
 
             for (int i = 0; i < threadCount; i++) {
 
@@ -1403,8 +1408,8 @@ public class DataGenerator {
 
             String elapsedTime = (new SimpleDateFormat("mm:ss")).format(new Date(elapsedTimeMilliseconds));
 
-            System.out.println("Insertion of items and work types finished at: " + endTime.toString());
-            System.out.println("Time elapsed: " + elapsedTime);
+            logger.debug("Insertion of items and work types finished at: " + endTime.toString());
+            logger.debug("Time elapsed: " + elapsedTime);
 
         } catch (Exception e) {
             e.printStackTrace();

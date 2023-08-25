@@ -1,5 +1,8 @@
 package homebeach;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.neo4j.driver.*;
 import org.neo4j.driver.Record;
 
@@ -10,6 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 
 public class QueryTester {
+
+    private static final Logger logger = LoggerFactory.getLogger(QueryTester.class);
 
     private HashMap<String, String[]> sql_databases;
 
@@ -33,7 +38,7 @@ public class QueryTester {
         Connection connection = null;
         Statement stmt = null;
 
-        System.out.println("Executing SQL Query: " + sqlQuery + " in " + sql_databases.size() + " databases with " + iterations + " iterations.");
+        logger.debug("Executing SQL Query: " + sqlQuery + " in " + sql_databases.size() + " databases with " + iterations + " iterations.");
 
         try {
 
@@ -62,7 +67,7 @@ public class QueryTester {
 
                 for(int i=0; i<iterations; i++) {
 
-                    System.out.println("Starting iteration: " + i + ".");
+                    logger.debug("Starting iteration: " + i + ".");
 
                     long startTimeInMilliseconds = System.currentTimeMillis();
 
@@ -79,9 +84,9 @@ public class QueryTester {
 
                 if(resultSet != null) {
                     resultSet.last();
-                    System.out.println("Query in url " + db_url + " returned " + resultSet.getRow() + " rows.");
+                    logger.debug("Query in url " + db_url + " returned " + resultSet.getRow() + " rows.");
                 } else {
-                    System.out.println("Query in url " + db_url + " returned 0 rows.");                     }
+                    logger.debug("Query in url " + db_url + " returned 0 rows.");                     }
                 }
 
         } catch (Exception e) {
@@ -103,7 +108,7 @@ public class QueryTester {
             }
         }
 
-        System.out.println();
+        logger.trace("");
 
         return resultLists;
     }
@@ -122,11 +127,11 @@ public class QueryTester {
 
         Result result = null;
 
-        System.out.println("Executing Cypher Query: " + cypherQuery + " with " + iterations + " iterations.");
+        logger.debug("Executing Cypher Query: " + cypherQuery + " with " + iterations + " iterations.");
 
         for(int i=0; i<iterations; i++) {
 
-            System.out.println("Starting iteration: " + i + ".");
+            logger.debug("Starting iteration: " + i + ".");
 
             long startTimeInMilliseconds = System.currentTimeMillis();
 
@@ -141,9 +146,9 @@ public class QueryTester {
 
         if(result != null) {
             List<Record> records = result.list();
-            System.out.println("Cypher query returned: " + records.size() + " records.");
+            logger.debug("Cypher query returned: " + records.size() + " records.");
         } else {
-            System.out.println("Cypher query returned: 0 records.");
+            logger.debug("Cypher query returned: 0 records.");
         }
         session.close();
         driver.close();
@@ -160,10 +165,10 @@ public class QueryTester {
         Collections.sort(results);
 
         if(showAll) {
-            System.out.println("Smallest number in resultset: ");
-            System.out.println(results.get(0));
-            System.out.println("Biggest number in resultset: ");
-            System.out.println(results.get(results.size() - 1));
+            logger.debug("Smallest number in resultset: ");
+            logger.debug("{}", results.get(0));
+            logger.debug("Biggest number in resultset: ");
+            logger.debug("{}", results.get(results.size() - 1));
         }
 
         if(results.size() > 2) {
@@ -174,14 +179,14 @@ public class QueryTester {
         long sum = 0;
 
         if(showAll) {
-            System.out.println();
-            System.out.println("Content of the results table:");
+            logger.trace("");
+            logger.debug("Content of the results table:");
         }
 
         for(int i=0; i<results.size(); i++) {
 
             if(showAll) {
-                System.out.println(results.get(i));
+                logger.debug("{}", results.get(i));
             }
             sum = sum + results.get(i);
         }
@@ -191,16 +196,16 @@ public class QueryTester {
         double standardDeviation = calculateStandardDeviation(results);
 
         if(showAll) {
-            System.out.println();
+            logger.trace("");
         }
 
-        System.out.println("Average time for query: ");
-        System.out.println(average);
-        System.out.println();
+        logger.debug("Average time for query: ");
+        logger.debug("{}", average);
+        logger.trace("");
 
-        System.out.println("Standard deviation of the results array: ");
-        System.out.println(standardDeviation);
-        System.out.println();
+        logger.debug("Standard deviation of the results array: ");
+        logger.debug("{}", standardDeviation);
+        logger.trace("");
 
 
 
@@ -226,7 +231,7 @@ public class QueryTester {
 
     public void executeQueryTestsSQL(int iterations, boolean showAll) {
 
-        System.out.println("Short query, work price");
+        logger.debug("Short query, work price");
 
         String workPriceSQL =
             "SELECT work.id AS workId, " +
@@ -243,10 +248,10 @@ public class QueryTester {
         for (String databaseVersion : resultLists.keySet()) {
 
             if(databaseVersion.contains("MariaDB")) {
-                System.out.println("Results for MariaDB version " + databaseVersion);
+                logger.debug("Results for MariaDB version " + databaseVersion);
             }
             else {
-                System.out.println("Results for MySQL version " + databaseVersion);
+                logger.debug("Results for MySQL version " + databaseVersion);
             }
 
             results = resultLists.get(databaseVersion);
@@ -254,7 +259,7 @@ public class QueryTester {
 
         }
 
-        System.out.println("Long query, work price");
+        logger.debug("Long query, work price");
 
         String workPriceWithItemsSQL =
             "SELECT work.id AS workId, " +
@@ -276,10 +281,10 @@ public class QueryTester {
         for (String databaseVersion : resultLists.keySet()) {
 
             if(databaseVersion.contains("MariaDB")) {
-                System.out.println("Results for MariaDB version " + databaseVersion);
+                logger.debug("Results for MariaDB version " + databaseVersion);
             }
             else {
-                System.out.println("Results for MySQL version " + databaseVersion);
+                logger.debug("Results for MySQL version " + databaseVersion);
             }
 
             results = resultLists.get(databaseVersion);
@@ -287,7 +292,7 @@ public class QueryTester {
 
         }
 
-        System.out.println("Query with defined key, work of invoiceId 0");
+        logger.debug("Query with defined key, work of invoiceId 0");
 
         String workOfInvoiceSQL = "SELECT * FROM work INNER JOIN workInvoice ON work.id=workInvoice.workId INNER JOIN invoice ON workInvoice.workId=invoice.id AND invoice.id=0";
 
@@ -296,10 +301,10 @@ public class QueryTester {
         for (String databaseVersion : resultLists.keySet()) {
 
             if(databaseVersion.contains("MariaDB")) {
-                System.out.println("Results for MariaDB version " + databaseVersion);
+                logger.debug("Results for MariaDB version " + databaseVersion);
             }
             else {
-                System.out.println("Results for MySQL version " + databaseVersion);
+                logger.debug("Results for MySQL version " + databaseVersion);
             }
 
             results = resultLists.get(databaseVersion);
@@ -311,7 +316,7 @@ public class QueryTester {
 
     public void executeQueryWithDefinedKeySQL(int iterations, boolean showAll) {
 
-        System.out.println("Query with defined key, invoice prices for customerId 0");
+        logger.debug("Query with defined key, invoice prices for customerId 0");
 
         String invoicePricesForCustomerSQL = "SELECT q1.customerId, q2.invoiceId, SUM(q3.price) AS invoicePrice FROM " +
                 "( SELECT customer.id AS customerId, invoice.id AS invoiceId FROM invoice INNER JOIN customer ON invoice.customerId=customer.id ) AS q1 INNER JOIN " +
@@ -324,10 +329,10 @@ public class QueryTester {
         for (String databaseVersion : resultLists.keySet()) {
 
             if(databaseVersion.contains("MariaDB")) {
-                System.out.println("Results for MariaDB version " + databaseVersion);
+                logger.debug("Results for MariaDB version " + databaseVersion);
             }
             else {
-                System.out.println("Results for MySQL version " + databaseVersion);
+                logger.debug("Results for MySQL version " + databaseVersion);
             }
 
             results = resultLists.get(databaseVersion);
@@ -339,9 +344,9 @@ public class QueryTester {
 
     public void executeQueryWithDefinedKeyCypher(int iterations, boolean showAll) {
 
-        System.out.println();
+        logger.trace("");
 
-        System.out.println("Query with defined key, invoice prices for customerId 0");
+        logger.debug("Query with defined key, invoice prices for customerId 0");
 
         String invoicePricesForCustomerCypher = "MATCH (c:customer)-[:PAYS]->(inv:invoice) WHERE c.customerId=0 " +
                 "WITH c, inv " +
@@ -355,10 +360,10 @@ public class QueryTester {
 
         showResults(results, showAll);
 
-        System.out.println();
+        logger.trace("");
 
 
-        System.out.println("Query with defined key with CALL, invoice prices for customerId 0");
+        logger.debug("Query with defined key with CALL, invoice prices for customerId 0");
 
         String invoicePricesForCustomerCypher3 = "MATCH (inv:invoice) WHERE inv.customerId=0 " +
         "CALL { " +
@@ -392,7 +397,7 @@ public class QueryTester {
 
     public void executeQueryTestsCypher(int iterations, boolean showAll) {
 
-        System.out.println("Short query1, work price");
+        logger.debug("Short query1, work price");
 
         String workPriceCypher = "MATCH (wt:worktype)-[h:WORKHOURS]->(w:work) WITH SUM(h.hours*h.discount*wt.price) as price, w RETURN w.workId as workId, price;";
 
@@ -400,9 +405,9 @@ public class QueryTester {
 
         showResults(results, showAll);
 
-        System.out.println();
+        logger.trace("");
 
-        System.out.println("Short query2, work price");
+        logger.debug("Short query2, work price");
 
         String workPriceCypher2 = "MATCH (w:work) " +
                 "CALL { " +
@@ -416,10 +421,10 @@ public class QueryTester {
 
         showResults(results, showAll);
 
-        System.out.println();
+        logger.trace("");
 
 
-        System.out.println("Long query1, work price");
+        logger.debug("Long query1, work price");
 
         String workPriceWithItemsCypher = "MATCH (wt:worktype)-[h:WORKHOURS]->(w:work)-[u:USED_ITEM]->(i:item) WITH SUM((h.hours*h.discount*wt.price)+(u.amount*u.discount*i.purchaseprice)) as price, w RETURN w.workId as workId, price";
 
@@ -427,7 +432,7 @@ public class QueryTester {
 
         showResults(results, showAll);
 
-        System.out.println("Long query2, work price");
+        logger.debug("Long query2, work price");
 
         String workPriceWithItemsCypher2 = "MATCH (w:work) " +
                 "CALL { " +
@@ -441,9 +446,9 @@ public class QueryTester {
 
         showResults(results, showAll);
 
-        System.out.println();
+        logger.trace("");
 
-        System.out.println("Query with defined key, work of invoice");
+        logger.debug("Query with defined key, work of invoice");
 
         String workOfInvoiceCypher = "MATCH (i:invoice { invoiceId:0 })-[wi:WORK_INVOICE]->(w:work) RETURN *";
 
@@ -455,7 +460,7 @@ public class QueryTester {
 
     public void executeComplexQueryTestSQL(int iterations, boolean showAll) {
 
-        System.out.println("Complex query, invoice price");
+        logger.debug("Complex query, invoice price");
 
         String invoicePriceSQL =
             "SELECT q1.invoiceId, SUM(q2.price) AS invoicePrice " +
@@ -483,10 +488,10 @@ public class QueryTester {
         for (String databaseVersion : resultLists.keySet()) {
 
             if(databaseVersion.contains("MariaDB")) {
-                System.out.println("Results for MariaDB version " + databaseVersion);
+                logger.debug("Results for MariaDB version " + databaseVersion);
             }
             else {
-                System.out.println("Results for MySQL version " + databaseVersion);
+                logger.debug("Results for MySQL version " + databaseVersion);
             }
 
             results = resultLists.get(databaseVersion);
@@ -494,15 +499,15 @@ public class QueryTester {
 
         }
 
-        System.out.println();
+        logger.trace("");
 
     }
 
     public void executeComplexQueryTestCypher(int iterations, boolean showAll) {
 
-        System.out.println("Complex query, invoice price");
+        logger.debug("Complex query, invoice price");
 
-        System.out.println();
+        logger.trace("");
 
         String invoicePriceCypher = "MATCH (inv:invoice)-[:WORK_INVOICE]->(w:work) " +
         "WITH inv, w " +
@@ -514,9 +519,9 @@ public class QueryTester {
 
         showResults(results, showAll);
 
-        System.out.println("Complex query with CALL, invoice price");
+        logger.debug("Complex query with CALL, invoice price");
 
-        System.out.println();
+        logger.trace("");
 
         String invoicePriceCypher3 =
                 "MATCH (inv:invoice) " +
@@ -542,9 +547,9 @@ public class QueryTester {
 
     public void executeCyclicQueryTestSQL(int iterations, boolean showAll, int invoiceId) {
 
-        System.out.println("Executing recursive query test");
+        logger.debug("Executing recursive query test");
 
-        System.out.println("Cyclic query SQL, invoices related to invoice id " + invoiceId);
+        logger.debug("Cyclic query SQL, invoices related to invoice id " + invoiceId);
 
         String previousInvoicesSQL = "SELECT  id,customerid,state,duedate,previousinvoice " +
                 "FROM (SELECT * FROM invoice " +
@@ -558,10 +563,10 @@ public class QueryTester {
         for (String databaseVersion : resultLists.keySet()) {
 
             if(databaseVersion.contains("MariaDB")) {
-                System.out.println("Results for MariaDB version " + databaseVersion);
+                logger.debug("Results for MariaDB version " + databaseVersion);
             }
             else {
-                System.out.println("Results for MySQL version " + databaseVersion);
+                logger.debug("Results for MySQL version " + databaseVersion);
             }
 
             results = resultLists.get(databaseVersion);
@@ -573,9 +578,9 @@ public class QueryTester {
 
     public void executeRecursiveQueryTestCypher(int iterations, boolean showAll, int invoiceId) {
 
-        System.out.println("Executing recursive query test");
+        logger.debug("Executing recursive query test");
 
-        System.out.println("Recursive query Cypher, invoices related to invoice id " + invoiceId);
+        logger.debug("Recursive query Cypher, invoices related to invoice id " + invoiceId);
 
         String previousInvoicesCypher = "MATCH (i:invoice { invoiceId:" + invoiceId + " })-[p:PREVIOUS_INVOICE *0..]->(j:invoice) RETURN *";
 
@@ -583,9 +588,9 @@ public class QueryTester {
 
         showResults(results, showAll);
 
-        System.out.println();
+        logger.trace("");
 
-        System.out.println("Recursive query Cypher optimized, invoices related to invoice id " + invoiceId);
+        logger.debug("Recursive query Cypher optimized, invoices related to invoice id " + invoiceId);
 
         String previousInvoicesCypherOptimized = "MATCH inv=(i:invoice { invoiceId:" + invoiceId + "})-[p:PREVIOUS_INVOICE *0..]->(j:invoice) WHERE NOT (j)-[:PREVIOUS_INVOICE]->() RETURN nodes(inv)";
 
@@ -598,9 +603,9 @@ public class QueryTester {
 
     public void executeRecursiveQueryTestSQL(int iterations, boolean showAll, int invoiceId) {
 
-        System.out.println("Executing recursive query test for optimized queries");
+        logger.debug("Executing recursive query test for optimized queries");
 
-        System.out.println("Recursive query SQL with Common Table Expressions, invoices related to invoice id " + invoiceId);
+        logger.debug("Recursive query SQL with Common Table Expressions, invoices related to invoice id " + invoiceId);
 
         String previousInvoicesCTESQL = "WITH RECURSIVE previous_invoices AS (" +
                 "SELECT id, customerId, state, duedate, previousinvoice " +
@@ -623,7 +628,7 @@ public class QueryTester {
         for (String databaseVersion : resultLists.keySet()) {
 
             if(databaseVersion.contains("MariaDB")) {
-                System.out.println("Results for MariaDB version " + databaseVersion);
+                logger.debug("Results for MariaDB version " + databaseVersion);
             }
 
             results = resultLists.get(databaseVersion);

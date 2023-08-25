@@ -1,5 +1,8 @@
 package homebeach;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.GraphDatabase;
 import org.neo4j.driver.Session;
@@ -12,6 +15,8 @@ import java.util.Random;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class DataGeneratorThreadItemsAndWorkTypes extends Thread {
+
+    private static final Logger logger = LoggerFactory.getLogger(DataGeneratorThreadItemsAndWorkTypes.class);
 
     private HashMap<String, String[]> sql_databases;
 
@@ -136,7 +141,7 @@ public class DataGeneratorThreadItemsAndWorkTypes extends Thread {
 
             PreparedStatement item;
 
-            System.out.println("threadIndex: " + threadIndex + " itemIndex: " + itemIndex);
+            logger.trace("threadIndex: " + threadIndex + " itemIndex: " + itemIndex);
 
             Random r = new Random(itemIndex);
             int balance = r.nextInt(100);

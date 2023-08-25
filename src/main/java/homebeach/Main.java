@@ -1,9 +1,14 @@
 package homebeach;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.HashMap;
 
 public class Main
 {
+    private static final Logger logger = LoggerFactory.getLogger(Main.class);
+
     public static void main(String[] args)
     {
 
@@ -59,14 +64,14 @@ public class Main
 
         QueryTester queryTester = new QueryTester(sql_databases, neo4j_settings);
 
-        System.out.println("NO INDEXES");
+        logger.debug("NO INDEXES");
 
         queryTester.executeQueryTestsSQL(12, true);
         queryTester.executeQueryTestsCypher(12, true);
 
-        System.out.println();
-        System.out.println("CREATING INDEXES");
-        System.out.println();
+        logger.trace("");
+        logger.debug("CREATING INDEXES");
+        logger.trace("");
 
         dataGenerator.createIndexes();
 
@@ -74,51 +79,51 @@ public class Main
         queryTester.executeQueryTestsCypher(12, true);
 
 
-        System.out.println();
-        System.out.println("DELETING INDEXES");
-        System.out.println();
+        logger.trace("");
+        logger.debug("DELETING INDEXES");
+        logger.trace("");
 
         dataGenerator.deleteIndexes();
 
         queryTester.executeComplexQueryTestSQL(12, true);
         queryTester.executeComplexQueryTestCypher(12, true);
 
-        System.out.println();
-        System.out.println("CREATING INDEXES");
-        System.out.println();
+        logger.trace("");
+        logger.debug("CREATING INDEXES");
+        logger.trace("");
 
         dataGenerator.createIndexes();
 
         queryTester.executeComplexQueryTestSQL(12, true);
         queryTester.executeComplexQueryTestCypher(12, true);
 
-        System.out.println();
-        System.out.println("DELETING INDEXES");
-        System.out.println();
+        logger.trace("");
+        logger.debug("DELETING INDEXES");
+        logger.trace("");
 
         dataGenerator.deleteIndexes();
 
-        System.out.println();
-        System.out.println("REMOVING MySQL");
-        System.out.println();
+        logger.trace("");
+        logger.debug("REMOVING MySQL");
+        logger.trace("");
         sql_databases.remove("jdbc:mysql://127.0.0.1:3307/");
 
 
         queryTester.executeQueryWithDefinedKeySQL(12, true);
         queryTester.executeQueryWithDefinedKeyCypher(12, true);
 
-        System.out.println();
-        System.out.println("CREATING INDEXES");
-        System.out.println();
+        logger.trace("");
+        logger.debug("CREATING INDEXES");
+        logger.trace("");
 
         dataGenerator.createIndexes();
 
         queryTester.executeQueryWithDefinedKeySQL(12, true);
         queryTester.executeQueryWithDefinedKeyCypher(12, true);
 
-        System.out.println();
-        System.out.println("DELETING INDEXES");
-        System.out.println();
+        logger.trace("");
+        logger.debug("DELETING INDEXES");
+        logger.trace("");
 
         dataGenerator.deleteIndexes();
 
@@ -130,7 +135,7 @@ public class Main
         queryTester.executeRecursiveQueryTestSQL(12, true, invoiceIndex);
         queryTester.executeRecursiveQueryTestCypher(12, true, invoiceIndex);
 
-        System.out.println("customerIndex " + customerIndex);
+        logger.debug("customerIndex " + customerIndex);
         dataGenerator.cleanSequentialInvoices(customerIndex);
 
         customerInvoice =  dataGenerator.insertSequentialInvoices(1,10,1000);
@@ -142,9 +147,9 @@ public class Main
 
         dataGenerator.cleanSequentialInvoices(customerIndex);
 
-        System.out.println();
-        System.out.println("CREATING INDEXES");
-        System.out.println();
+        logger.trace("");
+        logger.debug("CREATING INDEXES");
+        logger.trace("");
 
         dataGenerator.createIndexes();
 
@@ -156,7 +161,7 @@ public class Main
         queryTester.executeRecursiveQueryTestSQL(12, true, invoiceIndex);
         queryTester.executeRecursiveQueryTestCypher(12, true, invoiceIndex);
 
-        System.out.println("customerIndex " + customerIndex);
+        logger.debug("customerIndex " + customerIndex);
         dataGenerator.cleanSequentialInvoices(customerIndex);
 
         customerInvoice =  dataGenerator.insertSequentialInvoices(1,10,1000);

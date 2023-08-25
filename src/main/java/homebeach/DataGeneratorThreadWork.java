@@ -1,5 +1,8 @@
 package homebeach;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.GraphDatabase;
 import org.neo4j.driver.Session;
@@ -9,6 +12,8 @@ import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class DataGeneratorThreadWork extends Thread {
+
+    private static final Logger logger = LoggerFactory.getLogger(DataGeneratorThreadWork.class);
 
     private HashMap<String, String[]> sql_databases;
 
@@ -160,7 +165,7 @@ public class DataGeneratorThreadWork extends Thread {
         PreparedStatement usedItem;
         PreparedStatement workHours;
 
-        System.out.println("Thread: " + threadIndex + " workIndex: " + workIndex);
+        logger.trace("Thread: " + threadIndex + " workIndex: " + workIndex);
 
         int workIndexOriginal = workIndex;
 
@@ -188,8 +193,8 @@ public class DataGeneratorThreadWork extends Thread {
 
         List<Integer> itemIndexes = getItemIndexes(workIndex);
 
-        //System.out.println("itemIndexes");
-        //System.out.println(itemIndexes.toString());
+        //logger.trace("itemIndexes");
+        //logger.trace(itemIndexes.toString());
 
         int i = 0;
         while (i < itemIndexes.size()) {
@@ -226,8 +231,8 @@ public class DataGeneratorThreadWork extends Thread {
 
         List<Integer> workTypeIndexes = getWorkTypeIndexes(workIndex);
 
-        //System.out.println("workTypeIndexes");
-        //System.out.println(workTypeIndexes.toString());
+        //logger.debug("workTypeIndexes");
+        //logger.debug(workTypeIndexes.toString());
 
         i = 0;
         while (i < workTypeIndexes.size()) {
