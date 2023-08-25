@@ -15,9 +15,12 @@ public class RunQueryTests {
 
         final QueryTester queryTester = new QueryTester(Config.sql_databases, Config.neo4j_settings);
 
+        // iterations = 2
         // This run takes about 20 minutes on AMD Ryzen 7 2700X Eight-Core Processor 3.70 GHz.
+        // iterations = 3
+        // This run takes about 30 minutes on AMD Ryzen 7 2700X Eight-Core Processor 3.70 GHz.
         // This code is single threaded and CPU utilization is about 10%.
-        Param.iterations = 2;
+        Param.iterations = 3;
         Param.sequentialInvoices_100 = 10;
         Param.sequentialInvoices_1000 = 100;
 

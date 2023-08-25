@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.StringJoiner;
 
 public class QueryTester {
 
@@ -67,7 +68,7 @@ public class QueryTester {
 
                 for (int i = 0; i < iterations; i++) {
 
-                    logger.debug("Starting iteration: " + i + ".");
+                    logger.trace("Starting iteration: " + i + ".");
 
                     long startTimeInMilliseconds = System.currentTimeMillis();
 
@@ -84,9 +85,9 @@ public class QueryTester {
 
                 if (resultSet != null) {
                     resultSet.last();
-                    logger.debug("Query in url " + db_url + " returned " + resultSet.getRow() + " rows.");
+                    logger.debug("SQL Query returned " + resultSet.getRow() + " rows.");
                 } else {
-                    logger.debug("Query in url " + db_url + " returned 0 rows.");
+                    logger.debug("SQL Query returned 0 rows.");
                 }
             }
 
@@ -132,7 +133,7 @@ public class QueryTester {
 
         for (int i = 0; i < iterations; i++) {
 
-            logger.debug("Starting iteration: " + i + ".");
+            logger.trace("Starting iteration: " + i + ".");
 
             long startTimeInMilliseconds = System.currentTimeMillis();
 
@@ -163,49 +164,44 @@ public class QueryTester {
             return;
         }
 
-        Collections.sort(results);
+        //Collections.sort(results);
 
-        if (showAll) {
-            logger.debug("Smallest number in resultset: ");
-            logger.debug("{}", results.get(0));
-            logger.debug("Biggest number in resultset: ");
-            logger.debug("{}", results.get(results.size() - 1));
+        /*if (showAll) {
+            logger.debug("Smallest number in result set: {}", results.get(0));
+            logger.debug("Biggest number in result set: {}", results.get(results.size() - 1));
         }
 
         if (results.size() > 2) {
             results.remove(0);
             results.remove(results.size() - 1);
-        }
+        }*/
 
         long sum = 0;
 
         if (showAll) {
             logger.trace("");
-            logger.debug("Content of the results table:");
         }
 
+        String prefix = "Contents of the query timings table[" + results.size() + "]: ";
+        StringJoiner joiner = new StringJoiner(", ", prefix, "");
         for (int i = 0; i < results.size(); i++) {
 
             if (showAll) {
-                logger.debug("{}", results.get(i));
+                joiner.add(results.get(i).toString());
             }
             sum = sum + results.get(i);
         }
 
-        double average = sum / results.size();
+        long average = sum / results.size();
 
-        double standardDeviation = calculateStandardDeviation(results);
+        int standardDeviation = (int) (calculateStandardDeviation(results) + 0.5);
 
         if (showAll) {
+            logger.debug(joiner.toString());
             logger.trace("");
         }
 
-        logger.debug("Average time for query: ");
-        logger.debug("{}", average);
-        logger.trace("");
-
-        logger.debug("Standard deviation of the results array: ");
-        logger.debug("{}", standardDeviation);
+        logger.debug("Average time for query: {} ms, standard deviation: {}", average, standardDeviation);
         logger.trace("");
 
 
@@ -230,6 +226,7 @@ public class QueryTester {
 
     public void executeQueryTestsSQL(int iterations, boolean showAll) {
 
+        logger.debug("*");
         logger.debug("Short query, work price");
 
         String workPriceSQL =
@@ -311,6 +308,7 @@ public class QueryTester {
 
     public void executeQueryWithDefinedKeySQL(int iterations, boolean showAll) {
 
+        logger.debug("*");
         logger.debug("Query with defined key, invoice prices for customerId 0");
 
         String invoicePricesForCustomerSQL = "SELECT q1.customerId, q2.invoiceId, SUM(q3.price) AS invoicePrice FROM " +
@@ -338,8 +336,7 @@ public class QueryTester {
 
     public void executeQueryWithDefinedKeyCypher(int iterations, boolean showAll) {
 
-        logger.trace("");
-
+        logger.debug("*");
         logger.debug("Query with defined key, invoice prices for customerId 0");
 
         String invoicePricesForCustomerCypher = "MATCH (c:customer)-[:PAYS]->(inv:invoice) WHERE c.customerId=0 " +
@@ -391,6 +388,7 @@ public class QueryTester {
 
     public void executeQueryTestsCypher(int iterations, boolean showAll) {
 
+        logger.debug("*");
         logger.debug("Short query1, work price");
 
         String workPriceCypher = "MATCH (wt:worktype)-[h:WORKHOURS]->(w:work) WITH SUM(h.hours*h.discount*wt.price) as price, w RETURN w.workId as workId, price;";
@@ -454,6 +452,7 @@ public class QueryTester {
 
     public void executeComplexQueryTestSQL(int iterations, boolean showAll) {
 
+        logger.debug("*");
         logger.debug("Complex query, invoice price");
 
         String invoicePriceSQL =
@@ -498,6 +497,7 @@ public class QueryTester {
 
     public void executeComplexQueryTestCypher(int iterations, boolean showAll) {
 
+        logger.debug("*");
         logger.debug("Complex query, invoice price");
 
         logger.trace("");
@@ -569,6 +569,7 @@ public class QueryTester {
 
     public void executeRecursiveQueryTestCypher(int iterations, boolean showAll, int invoiceId) {
 
+        logger.debug("*");
         logger.debug("Executing recursive query test");
 
         logger.debug("Recursive query Cypher, invoices related to invoice id " + invoiceId);
@@ -594,6 +595,7 @@ public class QueryTester {
 
     public void executeRecursiveQueryTestSQL(int iterations, boolean showAll, int invoiceId) {
 
+        logger.debug("*");
         logger.debug("Executing recursive query test for optimized queries");
 
         logger.debug("Recursive query SQL with Common Table Expressions, invoices related to invoice id " + invoiceId);
