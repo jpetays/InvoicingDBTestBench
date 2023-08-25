@@ -12,8 +12,11 @@ public class GenerateData {
         dataGenerator.loadSampleData(Param.batchExecuteValue, Config.db_mariadb_url);
 
         dataGenerator.createTables();
+
         dataGenerator.insertItemsAndWorkTypes(Param.threadCount, Param.batchExecuteValue, Param.itemCount, Param.workTypeCount);
         dataGenerator.insertWorkData(Param.threadCount, Param.iterationsPerThread, Param.batchExecuteValue, Param.workTypeFactor, Param.itemFactor);
         dataGenerator.insertCustomerData(Param.threadCount, Param.iterationsPerThread, Param.batchExecuteValue, Param.invoiceFactor, Param.sequentialInvoices_0, Param.targetFactor, Param.workFactor);
+
+        dataGenerator.createIndexes();
     }
 }
