@@ -1,5 +1,6 @@
 package homebeach;
 
+import org.neo4j.driver.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,8 +88,6 @@ public class DataGenerator {
         }
 
     }
-
-
 
 
     public ResultSet executeSQLQuery(String sqlQuery) {
@@ -276,7 +275,6 @@ public class DataGenerator {
     }
 
 
-
     public void truncateDatabasesCustomer() {
 
         Connection conn = null;
@@ -379,12 +377,11 @@ public class DataGenerator {
 
         executeSQLUpdate(dropDatabase, "jdbc:mariadb://127.0.0.1/", db_settings);
         executeSQLUpdate(createDatabase, "jdbc:mariadb://127.0.0.1/", db_settings);
-        executeSQLUpdate(firstnames, "jdbc:mariadb://127.0.0.1/" +  database, db_settings);
-        executeSQLUpdate(surnames, "jdbc:mariadb://127.0.0.1/" +  database, db_settings);
-        executeSQLUpdate(addresses, "jdbc:mariadb://127.0.0.1/" +  database, db_settings);
+        executeSQLUpdate(firstnames, "jdbc:mariadb://127.0.0.1/" + database, db_settings);
+        executeSQLUpdate(surnames, "jdbc:mariadb://127.0.0.1/" + database, db_settings);
+        executeSQLUpdate(addresses, "jdbc:mariadb://127.0.0.1/" + database, db_settings);
 
     }
-
 
 
     public void getSampleData() {
@@ -430,9 +427,6 @@ public class DataGenerator {
     }
 
 
-
-
-
     public void printSampleDataSizes() {
 
         logger.debug("Firstnames size: " + firstnames.size());
@@ -447,7 +441,7 @@ public class DataGenerator {
 
         int workCount = 0;
 
-        while(rs.next()) {
+        while (rs.next()) {
 
             workCount = rs.getInt("WORKCOUNT");
 
@@ -462,7 +456,7 @@ public class DataGenerator {
 
         int workTypeCount = 0;
 
-        while(rs.next()) {
+        while (rs.next()) {
 
             workTypeCount = rs.getInt("WORKTYPECOUNT");
 
@@ -477,7 +471,7 @@ public class DataGenerator {
 
         int itemCount = 0;
 
-        while(rs.next()) {
+        while (rs.next()) {
 
             itemCount = rs.getInt("ITEMCOUNT");
 
@@ -492,7 +486,7 @@ public class DataGenerator {
 
         int customerCount = 0;
 
-        while(rs.next()) {
+        while (rs.next()) {
 
             customerCount = rs.getInt("CUSTOMERCOUNT");
 
@@ -501,13 +495,46 @@ public class DataGenerator {
         return customerCount;
     }
 
+    public int getCustomerCountCypher() {
+        return getNodeCountCypher("customer");
+    }
+    public int getInvoiceCountCypher() {
+        return getNodeCountCypher("invoice");
+    }
+    public int getItemCountCypher() {
+        return getNodeCountCypher("item");
+    }
+    public int getWorkCountCypher() {
+        return getNodeCountCypher("work");
+    }
+    public int getWorkTypeCountCypher() {
+        return getNodeCountCypher("worktype");
+    }
+
+    private int getNodeCountCypher(final String nodeName) {
+
+        String neo4j_db_url = neo4j_settings.get("NEO4J_DB_URL");
+        String neo4j_username = neo4j_settings.get("NEO4J_USERNAME");
+        String neo4j_password = neo4j_settings.get("NEO4J_PASSWORD");
+
+        try (org.neo4j.driver.Driver driver = GraphDatabase.driver(neo4j_db_url, AuthTokens.basic(neo4j_username, neo4j_password))) {
+            try (Session session = driver.session()) {
+
+                Result result = session.run("MATCH (n:" + nodeName + ") RETURN count(n) as count");
+                var record = result.single();
+                var value = record.get(0);
+                return value.asInt();
+            }
+        }
+    }
+
     public int getInvoiceCount() throws SQLException {
 
         ResultSet rs = executeSQLQuery("SELECT COUNT(*) AS INVOICECOUNT FROM WAREHOUSE.INVOICE");
 
         int invoiceCount = 0;
 
-        while(rs.next()) {
+        while (rs.next()) {
 
             invoiceCount = rs.getInt("INVOICECOUNT");
 
@@ -522,7 +549,7 @@ public class DataGenerator {
 
         int targetCount = 0;
 
-        while(rs.next()) {
+        while (rs.next()) {
 
             targetCount = rs.getInt("TARGETCOUNT");
 
@@ -537,7 +564,7 @@ public class DataGenerator {
 
         int lastCustomerId = 0;
 
-        while(rs.next()) {
+        while (rs.next()) {
 
             lastCustomerId = rs.getInt("LASTID");
 
@@ -552,7 +579,7 @@ public class DataGenerator {
 
         int workId = 0;
 
-        while(rs.next()) {
+        while (rs.next()) {
 
             workId = rs.getInt("LASTID");
 
@@ -567,7 +594,7 @@ public class DataGenerator {
 
         int invoiceId = 0;
 
-        while(rs.next()) {
+        while (rs.next()) {
 
             invoiceId = rs.getInt("LASTID");
 
@@ -582,7 +609,7 @@ public class DataGenerator {
 
         int targetId = 0;
 
-        while(rs.next()) {
+        while (rs.next()) {
 
             targetId = rs.getInt("LASTID");
 
@@ -597,7 +624,7 @@ public class DataGenerator {
 
         int itemId = 0;
 
-        while(rs.next()) {
+        while (rs.next()) {
 
             itemId = rs.getInt("LASTID");
 
@@ -612,7 +639,7 @@ public class DataGenerator {
 
         int workTypeId = 0;
 
-        while(rs.next()) {
+        while (rs.next()) {
 
             workTypeId = rs.getInt("LASTID");
 
@@ -683,10 +710,9 @@ public class DataGenerator {
         String createItemIndexSQL = "CREATE INDEX ItemIndex ON warehouse.item(purchaseprice)";
 
 
-
         for (String db_url : sql_databases.keySet()) {
 
-            if(db_url.contains("mariadb")) {
+            if (db_url.contains("mariadb")) {
 
                 String[] db_settings = sql_databases.get(db_url);
                 executeSQLUpdate(createInvoiceIndexIfNotExistsSQL, db_url, db_settings);
@@ -758,7 +784,6 @@ public class DataGenerator {
     }
 
 
-
     public void deleteIndexesSQL() {
 
         String dropInvoiceIndexIfExistsSQL = "DROP INDEX IF EXISTS invoiceIndex ON warehouse.invoice;";
@@ -774,7 +799,7 @@ public class DataGenerator {
 
         for (String db_url : sql_databases.keySet()) {
 
-            if(db_url.contains("mariadb")) {
+            if (db_url.contains("mariadb")) {
 
                 String[] db_settings = sql_databases.get(db_url);
                 executeSQLUpdate(dropInvoiceIndexIfExistsSQL, db_url, db_settings);
@@ -830,182 +855,179 @@ public class DataGenerator {
     }
 
 
-
-
     public void loadSampleData(int batchExecuteValue, String db_url) {
 
-            String[] db_settings = sql_databases.get(db_url);
+        String[] db_settings = sql_databases.get(db_url);
 
-            String jdbc_driver = db_settings[0];
+        String jdbc_driver = db_settings[0];
 
-            String username = db_settings[1];
-            String password = db_settings[2];
+        String username = db_settings[1];
+        String password = db_settings[2];
 
-            String firstnamesFile = "./data/firstnames.csv";
-            String surnamesFile = "./data/surnames.csv";
-            String addressesFile = "./data/city_of_houston.csv";
+        String firstnamesFile = "./data/firstnames.csv";
+        String surnamesFile = "./data/surnames.csv";
+        String addressesFile = "./data/city_of_houston.csv";
 
-            BufferedReader br = null;
-            String line = "";
-            String cvsSplitBy = ",";
-
-
-            try {
-
-                Connection connection = DriverManager.getConnection(db_url, username, password);
-
-                PreparedStatement firstnames = connection.prepareStatement("INSERT INTO testdata.firstnames (firstname) VALUES (?)");
-                PreparedStatement surnames = connection.prepareStatement("INSERT INTO testdata.surnames (surname) VALUES (?)");
-                PreparedStatement addresses = connection.prepareStatement("INSERT INTO testdata.addresses (street,city,district,region,postcode) VALUES (?,?,?,?,?)");
+        BufferedReader br = null;
+        String line = "";
+        String cvsSplitBy = ",";
 
 
-                boolean firstIteration = true;
+        try {
 
-                int index = 0;
+            Connection connection = DriverManager.getConnection(db_url, username, password);
 
-                br = new BufferedReader(new FileReader(firstnamesFile));
-                while ((line = br.readLine()) != null) {
+            PreparedStatement firstnames = connection.prepareStatement("INSERT INTO testdata.firstnames (firstname) VALUES (?)");
+            PreparedStatement surnames = connection.prepareStatement("INSERT INTO testdata.surnames (surname) VALUES (?)");
+            PreparedStatement addresses = connection.prepareStatement("INSERT INTO testdata.addresses (street,city,district,region,postcode) VALUES (?,?,?,?,?)");
 
-                    if(!firstIteration) {
 
-                        // use comma as separator
-                        String[] firstNameInArray = line.split(cvsSplitBy);
+            boolean firstIteration = true;
 
-                        String firstName = firstNameInArray[0].replaceAll("[\\\\/:*?\"<>|]", "");
+            int index = 0;
 
-                        firstnames.setString(1, firstName);
-                        firstnames.addBatch();
+            br = new BufferedReader(new FileReader(firstnamesFile));
+            while ((line = br.readLine()) != null) {
 
-                        if (index % batchExecuteValue == 0) {
+                if (!firstIteration) {
 
-                            firstnames.executeBatch();
+                    // use comma as separator
+                    String[] firstNameInArray = line.split(cvsSplitBy);
 
-                        }
+                    String firstName = firstNameInArray[0].replaceAll("[\\\\/:*?\"<>|]", "");
 
-                    } else {
+                    firstnames.setString(1, firstName);
+                    firstnames.addBatch();
 
-                        firstIteration = false;
+                    if (index % batchExecuteValue == 0) {
+
+                        firstnames.executeBatch();
 
                     }
 
-                    index++;
+                } else {
+
+                    firstIteration = false;
+
                 }
 
-                firstnames.executeBatch();
+                index++;
+            }
 
-                index = 0;
+            firstnames.executeBatch();
 
-                firstIteration = true;
+            index = 0;
 
-                br = new BufferedReader(new FileReader(surnamesFile));
-                while ((line = br.readLine()) != null) {
+            firstIteration = true;
 
-                    if(!firstIteration) {
+            br = new BufferedReader(new FileReader(surnamesFile));
+            while ((line = br.readLine()) != null) {
 
-                        // use comma as separator
-                        String[] surnameInArray = line.split(cvsSplitBy);
+                if (!firstIteration) {
 
-                        String surname = surnameInArray[0].toLowerCase().replaceAll("[\\\\/:*?\"<>|]", "");
-                        surname = surname.substring(0, 1).toUpperCase() + surname.substring(1);
+                    // use comma as separator
+                    String[] surnameInArray = line.split(cvsSplitBy);
 
-                        surnames.setString(1, surname);
-                        surnames.addBatch();
+                    String surname = surnameInArray[0].toLowerCase().replaceAll("[\\\\/:*?\"<>|]", "");
+                    surname = surname.substring(0, 1).toUpperCase() + surname.substring(1);
 
-                        if (index % batchExecuteValue == 0) {
+                    surnames.setString(1, surname);
+                    surnames.addBatch();
 
-                            surnames.executeBatch();
+                    if (index % batchExecuteValue == 0) {
 
-                        }
-
-                    } else {
-
-                        firstIteration = false;
+                        surnames.executeBatch();
 
                     }
-                    index++;
+
+                } else {
+
+                    firstIteration = false;
+
                 }
+                index++;
+            }
 
-                surnames.executeBatch();
+            surnames.executeBatch();
 
-                index = 0;
+            index = 0;
 
-                firstIteration = true;
+            firstIteration = true;
 
-                br = new BufferedReader(new FileReader(addressesFile));
-                while ((line = br.readLine()) != null) {
+            br = new BufferedReader(new FileReader(addressesFile));
+            while ((line = br.readLine()) != null) {
 
-                    if(!firstIteration) {
+                if (!firstIteration) {
 
-                        String[] addressInArray = line.split(cvsSplitBy);
+                    String[] addressInArray = line.split(cvsSplitBy);
 
-                        String street = addressInArray[3].toLowerCase().toLowerCase().replaceAll("[\\\\/:*?\"<>|]", "");
+                    String street = addressInArray[3].toLowerCase().toLowerCase().replaceAll("[\\\\/:*?\"<>|]", "");
 
-                        if(street.length() > 1) {
-                            street = street.substring(0, 1).toUpperCase() + street.substring(1);
-                        }
+                    if (street.length() > 1) {
+                        street = street.substring(0, 1).toUpperCase() + street.substring(1);
+                    }
 
-                        String city = addressInArray[5].toLowerCase();
+                    String city = addressInArray[5].toLowerCase();
 
-                        if(city.length() > 1) {
-                            city = city.substring(0, 1).toUpperCase() + city.substring(1);
-                        }
+                    if (city.length() > 1) {
+                        city = city.substring(0, 1).toUpperCase() + city.substring(1);
+                    }
 
-                        String district = addressInArray[6].toLowerCase();
+                    String district = addressInArray[6].toLowerCase();
 
-                        if(district.length() > 1) {
-                            district = district.substring(0, 1).toUpperCase() + district.substring(1);
-                        }
+                    if (district.length() > 1) {
+                        district = district.substring(0, 1).toUpperCase() + district.substring(1);
+                    }
 
 
-                        String region = addressInArray[7].toLowerCase();
+                    String region = addressInArray[7].toLowerCase();
 
-                        if(region.length() > 1) {
-                            region = region.substring(0, 1).toUpperCase() + region.substring(1);
-                        }
+                    if (region.length() > 1) {
+                        region = region.substring(0, 1).toUpperCase() + region.substring(1);
+                    }
 
-                        String postcode = addressInArray[8];
+                    String postcode = addressInArray[8];
 
-                        addresses.setString(1, street);
-                        addresses.setString(2, city);
-                        addresses.setString(3, district);
-                        addresses.setString(4, region);
-                        addresses.setString(5, postcode);
-                        addresses.addBatch();
+                    addresses.setString(1, street);
+                    addresses.setString(2, city);
+                    addresses.setString(3, district);
+                    addresses.setString(4, region);
+                    addresses.setString(5, postcode);
+                    addresses.addBatch();
 
-                        if (index % batchExecuteValue == 0) {
+                    if (index % batchExecuteValue == 0) {
 
-                            addresses.executeBatch();
-
-                        }
-
-                    } else {
-
-                        firstIteration = false;
+                        addresses.executeBatch();
 
                     }
-                    index++;
+
+                } else {
+
+                    firstIteration = false;
+
                 }
+                index++;
+            }
 
-                addresses.executeBatch();
+            addresses.executeBatch();
 
 
-            } catch (FileNotFoundException e) {
-                logger.error("unhandled exception", e);
-            } catch (IOException e) {
-                logger.error("unhandled exception", e);
-            } catch (SQLException e) {
-                logger.error("unhandled exception", e);
-            } finally {
-                if (br != null) {
-                    try {
-                        br.close();
-                    } catch (IOException e) {
-                        logger.error("unhandled exception", e);
-                    }
+        } catch (FileNotFoundException e) {
+            logger.error("unhandled exception", e);
+        } catch (IOException e) {
+            logger.error("unhandled exception", e);
+        } catch (SQLException e) {
+            logger.error("unhandled exception", e);
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    logger.error("unhandled exception", e);
                 }
             }
+        }
     }
-
 
 
     public void createTables() {
@@ -1109,16 +1131,16 @@ public class DataGenerator {
 
             executeSQLUpdate(dropDatabase, db_url, db_settings);
             executeSQLUpdate(createDatabase, db_url, db_settings);
-            executeSQLUpdate(customer, db_url +  database, db_settings);
-            executeSQLUpdate(item, db_url +  database, db_settings);
-            executeSQLUpdate(workType, db_url +  database, db_settings);
-            executeSQLUpdate(invoice, db_url +  database, db_settings);
-            executeSQLUpdate(target, db_url +  database, db_settings);
-            executeSQLUpdate(work, db_url +  database, db_settings);
-            executeSQLUpdate(workInvoice, db_url +  database, db_settings);
-            executeSQLUpdate(workTarget, db_url +  database, db_settings);
-            executeSQLUpdate(usedItem, db_url +  database, db_settings);
-            executeSQLUpdate(workHours, db_url +  database, db_settings);
+            executeSQLUpdate(customer, db_url + database, db_settings);
+            executeSQLUpdate(item, db_url + database, db_settings);
+            executeSQLUpdate(workType, db_url + database, db_settings);
+            executeSQLUpdate(invoice, db_url + database, db_settings);
+            executeSQLUpdate(target, db_url + database, db_settings);
+            executeSQLUpdate(work, db_url + database, db_settings);
+            executeSQLUpdate(workInvoice, db_url + database, db_settings);
+            executeSQLUpdate(workTarget, db_url + database, db_settings);
+            executeSQLUpdate(usedItem, db_url + database, db_settings);
+            executeSQLUpdate(workHours, db_url + database, db_settings);
 
         }
 
@@ -1130,7 +1152,7 @@ public class DataGenerator {
 
             int customerIndex;
 
-            if(getCustomerCount() == 0) {
+            if (getCustomerCount() == 0) {
                 customerIndex = 0;
             } else {
                 customerIndex = getLastCustomerId() + 1;
@@ -1138,7 +1160,7 @@ public class DataGenerator {
 
             int invoiceIndex;
 
-            if(getInvoiceCount() == 0) {
+            if (getInvoiceCount() == 0) {
                 invoiceIndex = 0;
             } else {
                 invoiceIndex = getLastInvoiceId() + 1;
@@ -1146,7 +1168,7 @@ public class DataGenerator {
 
             int targetIndex;
 
-            if(getTargetCount() == 0) {
+            if (getTargetCount() == 0) {
                 targetIndex = 0;
             } else {
                 targetIndex = getLastTargetId() + 1;
@@ -1154,7 +1176,7 @@ public class DataGenerator {
 
             int workCount = getWorkCount();
 
-            if(workCount < 1) {
+            if (workCount < 1) {
                 throw new Exception("Work count is smaller than 1!");
             }
 
@@ -1174,8 +1196,8 @@ public class DataGenerator {
                 DataGeneratorThreadCustomer thread = new DataGeneratorThreadCustomer(i, iterationsPerThread, batchExecuteValue, sql_databases, neo4j_settings, lock, invoiceFactor, targetFactor, workFactor, sequentialInvoices, firstnames, surnames, addresses, customerIndex, invoiceIndex, targetIndex, workCount);
                 executor.execute(thread);
                 customerIndex = customerIndex + iterationsPerThread;
-                invoiceIndex = invoiceIndex + iterationsPerThread*invoiceFactor;
-                targetIndex = targetIndex + iterationsPerThread*targetFactor;
+                invoiceIndex = invoiceIndex + iterationsPerThread * invoiceFactor;
+                targetIndex = targetIndex + iterationsPerThread * targetFactor;
             }
 
             executor.shutdown();
@@ -1296,9 +1318,8 @@ public class DataGenerator {
             logger.error("unhandled exception", e);
         }
 
-    return customerInvoice;
+        return customerInvoice;
     }
-
 
 
     public void insertWorkData(int threadCount, int iterationsPerThread, int batchExecuteValue, int workTypeFactor, int itemFactor) {
@@ -1308,7 +1329,7 @@ public class DataGenerator {
 
             int workIndex;
 
-            if(getWorkCount() == 0) {
+            if (getWorkCount() == 0) {
                 workIndex = 0;
             } else {
                 workIndex = getLastWorkId() + 1;
@@ -1363,7 +1384,7 @@ public class DataGenerator {
 
             int itemIndex;
 
-            if(getItemCount() == 0) {
+            if (getItemCount() == 0) {
                 itemIndex = 0;
             } else {
                 itemIndex = getLastItemId() + 1;
@@ -1371,7 +1392,7 @@ public class DataGenerator {
 
             int workTypeIndex;
 
-            if(getWorkTypeCount() == 0) {
+            if (getWorkTypeCount() == 0) {
                 workTypeIndex = 0;
             } else {
                 workTypeIndex = getLastWorkTypeId() + 1;
