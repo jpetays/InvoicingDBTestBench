@@ -13,8 +13,6 @@ public class ShowCurrentData {
 
         final DataGenerator dataGenerator = new DataGenerator(Config.sql_databases, Config.neo4j_settings, Config.db_mariadb_url);
 
-        String[] db_settings = Config.sql_databases.get(Config.db_mariadb_url);
-
         logger.debug("Get SQL row counts from {}", Config.db_mariadb_url);
         final var customerCount = dataGenerator.getCustomerCount();
         final var lastCustomerId = dataGenerator.getLastCustomerId();
