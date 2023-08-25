@@ -124,7 +124,7 @@ public class DataGeneratorThreadItemsAndWorkTypes extends Thread {
             driver.close();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("unhandled exception", e);
         }
     }
 

@@ -62,27 +62,27 @@ public class DataGenerator {
 
         } catch (SQLException e) {
             logger.debug("SQLException");
-            e.printStackTrace();
+            logger.error("unhandled exception", e);
         } catch (Exception e) {
             logger.debug("Exception");
-            e.printStackTrace();
+            logger.error("unhandled exception", e);
         } finally {
 
             try {
                 if (stmt != null) {
                     conn.close();
                 }
-            } catch (SQLException se) {
+            } catch (SQLException e) {
                 logger.debug("SQLException");
-                se.printStackTrace();
+                logger.error("unhandled exception", e);
             }
             try {
                 if (conn != null) {
                     conn.close();
                 }
-            } catch (SQLException se) {
+            } catch (SQLException e) {
                 logger.debug("SQLException");
-                se.printStackTrace();
+                logger.error("unhandled exception", e);
             }
         }
 
@@ -114,9 +114,9 @@ public class DataGenerator {
             resultSet = stmt.executeQuery(sqlQuery);
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("unhandled exception", e);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("unhandled exception", e);
         } finally {
 
             try {
@@ -129,8 +129,8 @@ public class DataGenerator {
                 if (conn != null) {
                     conn.close();
                 }
-            } catch (SQLException se) {
-                se.printStackTrace();
+            } catch (SQLException e) {
+                logger.error("unhandled exception", e);
             }
         }
 
@@ -187,7 +187,7 @@ public class DataGenerator {
                 stmt.executeBatch();
 
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("unhandled exception", e);
             } finally {
 
                 try {
@@ -200,8 +200,8 @@ public class DataGenerator {
                     if (conn != null) {
                         conn.close();
                     }
-                } catch (SQLException se) {
-                    se.printStackTrace();
+                } catch (SQLException e) {
+                    logger.error("unhandled exception", e);
                 }
 
             }
@@ -252,7 +252,7 @@ public class DataGenerator {
                 stmt.executeBatch();
 
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("unhandled exception", e);
             } finally {
 
                 try {
@@ -265,8 +265,8 @@ public class DataGenerator {
                     if (conn != null) {
                         conn.close();
                     }
-                } catch (SQLException se) {
-                    se.printStackTrace();
+                } catch (SQLException e) {
+                    logger.error("unhandled exception", e);
                 }
 
             }
@@ -324,7 +324,7 @@ public class DataGenerator {
                 stmt.executeBatch();
 
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("unhandled exception", e);
             } finally {
 
                 try {
@@ -337,8 +337,8 @@ public class DataGenerator {
                     if (conn != null) {
                         conn.close();
                     }
-                } catch (SQLException se) {
-                    se.printStackTrace();
+                } catch (SQLException e) {
+                    logger.error("unhandled exception", e);
                 }
 
             }
@@ -990,17 +990,17 @@ public class DataGenerator {
 
 
             } catch (FileNotFoundException e) {
-                e.printStackTrace();
+                logger.error("unhandled exception", e);
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("unhandled exception", e);
             } catch (SQLException e) {
-                e.printStackTrace();
+                logger.error("unhandled exception", e);
             } finally {
                 if (br != null) {
                     try {
                         br.close();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        logger.error("unhandled exception", e);
                     }
                 }
             }
@@ -1195,7 +1195,7 @@ public class DataGenerator {
 
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("unhandled exception", e);
         }
     }
 
@@ -1293,7 +1293,7 @@ public class DataGenerator {
 
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("unhandled exception", e);
         }
 
     return customerInvoice;
@@ -1352,7 +1352,7 @@ public class DataGenerator {
             logger.debug("Time elapsed: " + elapsedTime);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("unhandled exception", e);
         }
     }
 
@@ -1412,7 +1412,7 @@ public class DataGenerator {
             logger.debug("Time elapsed: " + elapsedTime);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("unhandled exception", e);
         }
 
     }

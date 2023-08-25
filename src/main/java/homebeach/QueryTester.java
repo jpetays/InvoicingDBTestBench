@@ -90,7 +90,7 @@ public class QueryTester {
                 }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("unhandled exception", e);
         } finally {
 
             try {
@@ -103,8 +103,8 @@ public class QueryTester {
                 if (connection != null) {
                     connection.close();
                 }
-            } catch (SQLException se) {
-                se.printStackTrace();
+            } catch (SQLException e) {
+                logger.error("unhandled exception", e);
             }
         }
 

@@ -3,6 +3,8 @@ package homebeach;
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.GraphDatabase;
 import org.neo4j.driver.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.text.DateFormat;
@@ -13,6 +15,8 @@ import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class DataGeneratorThreadSequentialInvoices extends Thread {
+
+    private static final Logger logger = LoggerFactory.getLogger(DataGeneratorThreadSequentialInvoices.class);
 
     private HashMap<String, String[]> sql_databases;
 
@@ -99,7 +103,7 @@ public class DataGeneratorThreadSequentialInvoices extends Thread {
             driver.close();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("unhandled exception", e);
         }
     }
 
