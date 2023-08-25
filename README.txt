@@ -1,3 +1,5 @@
+This fork is reafctoried for indexed MariaDb and Neo4j only. Log4j is used to log results on a file.
+
 Invoicing Database Test Bench
 
 
