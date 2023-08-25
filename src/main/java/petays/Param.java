@@ -1,23 +1,45 @@
 package petays;
 
 public abstract class Param {
-    public static final int threadCount = 10;
-    public static final int batchExecuteValue = 10;
-    public static final int iterationsPerThread = 1000;
+    public static int threadCount;
+    public static int batchExecuteValue;
+    public static int iterationsPerThread;
 
-    public static final int itemCount = 10000;
-    public static final int workTypeCount = 10000;
+    public static int itemCount;
+    public static int workTypeCount;
 
-    public static final int workTypeFactor = 10;
-    public static final int itemFactor = 10;
+    public static int workTypeFactor;
+    public static int itemFactor;
 
-    public static final int invoiceFactor = 10;
-    public static final int sequentialInvoices_0 = 0;
-    public static final int sequentialInvoices_100 = 100;
-    public static final int sequentialInvoices_1000 = 1000;
-    public static final int targetFactor = 10;
-    public static final int workFactor = 10;
+    public static int invoiceFactor;
+    public static int sequentialInvoices_0;
+    public static int sequentialInvoices_100;
+    public static int sequentialInvoices_1000;
+    public static int targetFactor;
+    public static int workFactor;
 
-    public static final int iterations = 12;
-    public static final boolean showAll = true;
+    public static int iterations;
+    public static boolean showAll;
+
+    static {
+        threadCount = 10;
+        batchExecuteValue = 10;
+        iterationsPerThread = 1000;
+
+        itemCount = 10000;
+        workTypeCount = 10000;
+
+        workTypeFactor = 10;
+        itemFactor = 10;
+
+        invoiceFactor = 10;
+        sequentialInvoices_0 = 0;
+        sequentialInvoices_100 = 100;
+        sequentialInvoices_1000 = 1000;
+        targetFactor = 10;
+        workFactor = 10;
+
+        iterations = 12;
+        showAll = true;
+    }
 }
