@@ -1,5 +1,7 @@
 package homebeach;
 
+import org.neo4j.driver.Config;
+import org.neo4j.driver.Logging;
 import org.neo4j.driver.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -517,7 +519,9 @@ public class DataGenerator {
         String neo4j_username = neo4j_settings.get("NEO4J_USERNAME");
         String neo4j_password = neo4j_settings.get("NEO4J_PASSWORD");
 
-        try (org.neo4j.driver.Driver driver = GraphDatabase.driver(neo4j_db_url, AuthTokens.basic(neo4j_username, neo4j_password))) {
+        // https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Logging.html
+        var config = Config.builder().withLogging(Logging.none()).build();
+        try (org.neo4j.driver.Driver driver = GraphDatabase.driver(neo4j_db_url, AuthTokens.basic(neo4j_username, neo4j_password), config)) {
             try (Session session = driver.session()) {
 
                 Result result = session.run("MATCH (n:" + nodeName + ") RETURN count(n) as count");
