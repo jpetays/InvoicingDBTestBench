@@ -148,7 +148,7 @@ public class DataGenerator {
         String neo4j_username = neo4j_settings.get("NEO4J_USERNAME");
         String neo4j_password = neo4j_settings.get("NEO4J_PASSWORD");
 
-        org.neo4j.driver.Driver driver = GraphDatabase.driver(neo4j_db_url, AuthTokens.basic(neo4j_username, neo4j_password));
+        org.neo4j.driver.Driver driver = QueryTester.getNeo4jDriver(neo4j_db_url, AuthTokens.basic(neo4j_username, neo4j_password));
 
         Session session = driver.session();
 
@@ -221,7 +221,7 @@ public class DataGenerator {
         String neo4j_username = neo4j_settings.get("NEO4J_USERNAME");
         String neo4j_password = neo4j_settings.get("NEO4J_PASSWORD");
 
-        org.neo4j.driver.Driver driver = GraphDatabase.driver(neo4j_db_url, AuthTokens.basic(neo4j_username, neo4j_password));
+        org.neo4j.driver.Driver driver = QueryTester.getNeo4jDriver(neo4j_db_url, AuthTokens.basic(neo4j_username, neo4j_password));
 
         Session session = driver.session();
 
@@ -287,7 +287,7 @@ public class DataGenerator {
         String neo4j_username = neo4j_settings.get("NEO4J_USERNAME");
         String neo4j_password = neo4j_settings.get("NEO4J_PASSWORD");
 
-        org.neo4j.driver.Driver driver = GraphDatabase.driver(neo4j_db_url, AuthTokens.basic(neo4j_username, neo4j_password));
+        org.neo4j.driver.Driver driver = QueryTester.getNeo4jDriver(neo4j_db_url, AuthTokens.basic(neo4j_username, neo4j_password));
 
         Session session = driver.session();
 
@@ -519,9 +519,7 @@ public class DataGenerator {
         String neo4j_username = neo4j_settings.get("NEO4J_USERNAME");
         String neo4j_password = neo4j_settings.get("NEO4J_PASSWORD");
 
-        // https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Logging.html
-        var config = Config.builder().withLogging(Logging.none()).build();
-        try (org.neo4j.driver.Driver driver = GraphDatabase.driver(neo4j_db_url, AuthTokens.basic(neo4j_username, neo4j_password), config)) {
+        try (org.neo4j.driver.Driver driver = QueryTester.getNeo4jDriver(neo4j_db_url, AuthTokens.basic(neo4j_username, neo4j_password))) {
             try (Session session = driver.session()) {
 
                 Result result = session.run("MATCH (n:" + nodeName + ") RETURN count(n) as count");
@@ -659,7 +657,7 @@ public class DataGenerator {
         String neo4j_username = neo4j_settings.get("NEO4J_USERNAME");
         String neo4j_password = neo4j_settings.get("NEO4J_PASSWORD");
 
-        org.neo4j.driver.Driver driver = GraphDatabase.driver(neo4j_db_url, AuthTokens.basic(neo4j_username, neo4j_password));
+        org.neo4j.driver.Driver driver = QueryTester.getNeo4jDriver(neo4j_db_url, AuthTokens.basic(neo4j_username, neo4j_password));
 
         Session session = driver.session();
 
@@ -747,7 +745,7 @@ public class DataGenerator {
         String neo4j_username = neo4j_settings.get("NEO4J_USERNAME");
         String neo4j_password = neo4j_settings.get("NEO4J_PASSWORD");
 
-        org.neo4j.driver.Driver driver = GraphDatabase.driver(neo4j_db_url, AuthTokens.basic(neo4j_username, neo4j_password));
+        org.neo4j.driver.Driver driver = QueryTester.getNeo4jDriver(neo4j_db_url, AuthTokens.basic(neo4j_username, neo4j_password));
 
         Session session = driver.session();
 
@@ -834,7 +832,7 @@ public class DataGenerator {
         String neo4j_username = neo4j_settings.get("NEO4J_USERNAME");
         String neo4j_password = neo4j_settings.get("NEO4J_PASSWORD");
 
-        org.neo4j.driver.Driver driver = GraphDatabase.driver(neo4j_db_url, AuthTokens.basic(neo4j_username, neo4j_password));
+        org.neo4j.driver.Driver driver = QueryTester.getNeo4jDriver(neo4j_db_url, AuthTokens.basic(neo4j_username, neo4j_password));
 
         Session session = driver.session();
 
@@ -1283,7 +1281,7 @@ public class DataGenerator {
             String neo4j_username = neo4j_settings.get("NEO4J_USERNAME");
             String neo4j_password = neo4j_settings.get("NEO4J_PASSWORD");
 
-            org.neo4j.driver.Driver driver = GraphDatabase.driver(neo4j_db_url, AuthTokens.basic(neo4j_username, neo4j_password));
+            org.neo4j.driver.Driver driver = QueryTester.getNeo4jDriver(neo4j_db_url, AuthTokens.basic(neo4j_username, neo4j_password));
 
             Session session = driver.session();
 

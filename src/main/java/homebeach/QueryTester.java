@@ -65,7 +65,7 @@ public class QueryTester {
 
                 ResultSet resultSet = null;
 
-                for(int i=0; i<iterations; i++) {
+                for (int i = 0; i < iterations; i++) {
 
                     logger.debug("Starting iteration: " + i + ".");
 
@@ -82,12 +82,13 @@ public class QueryTester {
 
                 resultLists.put(productVersion, results);
 
-                if(resultSet != null) {
+                if (resultSet != null) {
                     resultSet.last();
                     logger.debug("Query in url " + db_url + " returned " + resultSet.getRow() + " rows.");
                 } else {
-                    logger.debug("Query in url " + db_url + " returned 0 rows.");                     }
+                    logger.debug("Query in url " + db_url + " returned 0 rows.");
                 }
+            }
 
         } catch (Exception e) {
             logger.error("unhandled exception", e);
@@ -119,7 +120,7 @@ public class QueryTester {
         String neo4j_username = neo4j_settings.get("NEO4J_USERNAME");
         String neo4j_password = neo4j_settings.get("NEO4J_PASSWORD");
 
-        org.neo4j.driver.Driver driver = GraphDatabase.driver(neo4j_db_url, AuthTokens.basic(neo4j_username, neo4j_password));
+        org.neo4j.driver.Driver driver = getNeo4jDriver(neo4j_db_url, AuthTokens.basic(neo4j_username, neo4j_password));
 
         Session session = driver.session();
 
@@ -129,7 +130,7 @@ public class QueryTester {
 
         logger.debug("Executing Cypher Query: " + cypherQuery + " with " + iterations + " iterations.");
 
-        for(int i=0; i<iterations; i++) {
+        for (int i = 0; i < iterations; i++) {
 
             logger.debug("Starting iteration: " + i + ".");
 
@@ -144,7 +145,7 @@ public class QueryTester {
 
         }
 
-        if(result != null) {
+        if (result != null) {
             List<Record> records = result.list();
             logger.debug("Cypher query returned: " + records.size() + " records.");
         } else {
@@ -158,34 +159,34 @@ public class QueryTester {
 
     public void showResults(List<Long> results, boolean showAll) {
 
-        if(results.size() == 0) {
+        if (results.size() == 0) {
             return;
         }
 
         Collections.sort(results);
 
-        if(showAll) {
+        if (showAll) {
             logger.debug("Smallest number in resultset: ");
             logger.debug("{}", results.get(0));
             logger.debug("Biggest number in resultset: ");
             logger.debug("{}", results.get(results.size() - 1));
         }
 
-        if(results.size() > 2) {
+        if (results.size() > 2) {
             results.remove(0);
             results.remove(results.size() - 1);
         }
 
         long sum = 0;
 
-        if(showAll) {
+        if (showAll) {
             logger.trace("");
             logger.debug("Content of the results table:");
         }
 
-        for(int i=0; i<results.size(); i++) {
+        for (int i = 0; i < results.size(); i++) {
 
-            if(showAll) {
+            if (showAll) {
                 logger.debug("{}", results.get(i));
             }
             sum = sum + results.get(i);
@@ -195,7 +196,7 @@ public class QueryTester {
 
         double standardDeviation = calculateStandardDeviation(results);
 
-        if(showAll) {
+        if (showAll) {
             logger.trace("");
         }
 
@@ -208,25 +209,23 @@ public class QueryTester {
         logger.trace("");
 
 
-
     }
 
-    public static double calculateStandardDeviation(List<Long> results)
-    {
+    public static double calculateStandardDeviation(List<Long> results) {
         double sum = 0.0, standardDeviation = 0.0;
         int size = results.size();
 
-        for(long result : results) {
+        for (long result : results) {
             sum += result;
         }
 
-        double mean = sum/size;
+        double mean = sum / size;
 
-        for(double result: results) {
+        for (double result : results) {
             standardDeviation += Math.pow(result - mean, 2);
         }
 
-        return Math.sqrt(standardDeviation/size);
+        return Math.sqrt(standardDeviation / size);
     }
 
     public void executeQueryTestsSQL(int iterations, boolean showAll) {
@@ -234,23 +233,22 @@ public class QueryTester {
         logger.debug("Short query, work price");
 
         String workPriceSQL =
-            "SELECT work.id AS workId, " +
-            "SUM( " +
-            "(worktype.price * workhours.hours * workhours.discount) " +
-            ") AS price " +
-            "FROM work " +
-            "INNER JOIN workhours ON work.id = workhours.workId " +
-            "INNER JOIN worktype ON worktype.id = workhours.worktypeId " +
-            "GROUP BY work.id";
+                "SELECT work.id AS workId, " +
+                        "SUM( " +
+                        "(worktype.price * workhours.hours * workhours.discount) " +
+                        ") AS price " +
+                        "FROM work " +
+                        "INNER JOIN workhours ON work.id = workhours.workId " +
+                        "INNER JOIN worktype ON worktype.id = workhours.worktypeId " +
+                        "GROUP BY work.id";
 
         resultLists = measureQueryTimeSQL(workPriceSQL, iterations);
 
         for (String databaseVersion : resultLists.keySet()) {
 
-            if(databaseVersion.contains("MariaDB")) {
+            if (databaseVersion.contains("MariaDB")) {
                 logger.debug("Results for MariaDB version " + databaseVersion);
-            }
-            else {
+            } else {
                 logger.debug("Results for MySQL version " + databaseVersion);
             }
 
@@ -262,28 +260,26 @@ public class QueryTester {
         logger.debug("Long query, work price");
 
         String workPriceWithItemsSQL =
-            "SELECT work.id AS workId, " +
-            "SUM(" +
-            "(worktype.price * workhours.hours * workhours.discount) + " +
-            "(item.purchaseprice * useditem.amount * useditem.discount) " +
-            ") AS price " +
-            "FROM work " +
-            "INNER JOIN workhours ON work.id = workhours.workId " +
-            "INNER JOIN worktype ON worktype.id = workhours.worktypeId " +
-            "INNER JOIN useditem ON work.id = useditem.workId " +
-            "INNER JOIN item ON useditem.itemId = item.id " +
-            "GROUP BY work.id";
-
+                "SELECT work.id AS workId, " +
+                        "SUM(" +
+                        "(worktype.price * workhours.hours * workhours.discount) + " +
+                        "(item.purchaseprice * useditem.amount * useditem.discount) " +
+                        ") AS price " +
+                        "FROM work " +
+                        "INNER JOIN workhours ON work.id = workhours.workId " +
+                        "INNER JOIN worktype ON worktype.id = workhours.worktypeId " +
+                        "INNER JOIN useditem ON work.id = useditem.workId " +
+                        "INNER JOIN item ON useditem.itemId = item.id " +
+                        "GROUP BY work.id";
 
 
         resultLists = measureQueryTimeSQL(workPriceWithItemsSQL, iterations);
 
         for (String databaseVersion : resultLists.keySet()) {
 
-            if(databaseVersion.contains("MariaDB")) {
+            if (databaseVersion.contains("MariaDB")) {
                 logger.debug("Results for MariaDB version " + databaseVersion);
-            }
-            else {
+            } else {
                 logger.debug("Results for MySQL version " + databaseVersion);
             }
 
@@ -300,10 +296,9 @@ public class QueryTester {
 
         for (String databaseVersion : resultLists.keySet()) {
 
-            if(databaseVersion.contains("MariaDB")) {
+            if (databaseVersion.contains("MariaDB")) {
                 logger.debug("Results for MariaDB version " + databaseVersion);
-            }
-            else {
+            } else {
                 logger.debug("Results for MySQL version " + databaseVersion);
             }
 
@@ -328,10 +323,9 @@ public class QueryTester {
 
         for (String databaseVersion : resultLists.keySet()) {
 
-            if(databaseVersion.contains("MariaDB")) {
+            if (databaseVersion.contains("MariaDB")) {
                 logger.debug("Results for MariaDB version " + databaseVersion);
-            }
-            else {
+            } else {
                 logger.debug("Results for MySQL version " + databaseVersion);
             }
 
@@ -366,22 +360,22 @@ public class QueryTester {
         logger.debug("Query with defined key with CALL, invoice prices for customerId 0");
 
         String invoicePricesForCustomerCypher3 = "MATCH (inv:invoice) WHERE inv.customerId=0 " +
-        "CALL { " +
-        "   WITH inv " +
-        "   MATCH (c:customer)-[:PAYS]->(inv) " +
-        "   RETURN c " +
-        "}" +
-        "CALL { " +
-        "   WITH c, inv " +
-        "   MATCH (inv)-[:WORK_INVOICE]->(w:work) " +
-        "   RETURN w " +
-        "} " +
-        "CALL { " +
-        "   WITH w " +
-        "   MATCH (wt:worktype)-[h:WORKHOURS]->(w)-[u:USED_ITEM]->(i:item) " +
-        "   RETURN SUM((h.hours*h.discount*wt.price)+(u.amount*u.discount*i.purchaseprice)) as workPrice " +
-        "} " +
-        "RETURN c, inv, SUM(workPrice) as invoicePrice";
+                "CALL { " +
+                "   WITH inv " +
+                "   MATCH (c:customer)-[:PAYS]->(inv) " +
+                "   RETURN c " +
+                "}" +
+                "CALL { " +
+                "   WITH c, inv " +
+                "   MATCH (inv)-[:WORK_INVOICE]->(w:work) " +
+                "   RETURN w " +
+                "} " +
+                "CALL { " +
+                "   WITH w " +
+                "   MATCH (wt:worktype)-[h:WORKHOURS]->(w)-[u:USED_ITEM]->(i:item) " +
+                "   RETURN SUM((h.hours*h.discount*wt.price)+(u.amount*u.discount*i.purchaseprice)) as workPrice " +
+                "} " +
+                "RETURN c, inv, SUM(workPrice) as invoicePrice";
 
         results = measureQueryTimeCypher(invoicePricesForCustomerCypher3, iterations);
 
@@ -463,34 +457,33 @@ public class QueryTester {
         logger.debug("Complex query, invoice price");
 
         String invoicePriceSQL =
-            "SELECT q1.invoiceId, SUM(q2.price) AS invoicePrice " +
-            "FROM ( " +
-            "SELECT workinvoice.invoiceId, workinvoice.workId " +
-            "FROM workinvoice " +
-            "INNER JOIN invoice ON workinvoice.invoiceId = invoice.id " +
-            ") AS q1 " +
-            "INNER JOIN ( " +
-            "SELECT workhours.workid AS workId, " +
-            "SUM( " +
-            "(worktype.price * workhours.hours * workhours.discount) + " +
-            "(item.purchaseprice * useditem.amount * useditem.discount) " +
-            ") AS price " +
-            "FROM workhours " +
-            "INNER JOIN worktype ON workhours.worktypeid = worktype.id " +
-            "INNER JOIN useditem ON workhours.workid = useditem.workid " +
-            "INNER JOIN item ON useditem.itemid = item.id " +
-            "GROUP BY workhours.workid " +
-            ") AS q2 USING (workId) " +
-            "GROUP BY q1.invoiceId";
+                "SELECT q1.invoiceId, SUM(q2.price) AS invoicePrice " +
+                        "FROM ( " +
+                        "SELECT workinvoice.invoiceId, workinvoice.workId " +
+                        "FROM workinvoice " +
+                        "INNER JOIN invoice ON workinvoice.invoiceId = invoice.id " +
+                        ") AS q1 " +
+                        "INNER JOIN ( " +
+                        "SELECT workhours.workid AS workId, " +
+                        "SUM( " +
+                        "(worktype.price * workhours.hours * workhours.discount) + " +
+                        "(item.purchaseprice * useditem.amount * useditem.discount) " +
+                        ") AS price " +
+                        "FROM workhours " +
+                        "INNER JOIN worktype ON workhours.worktypeid = worktype.id " +
+                        "INNER JOIN useditem ON workhours.workid = useditem.workid " +
+                        "INNER JOIN item ON useditem.itemid = item.id " +
+                        "GROUP BY workhours.workid " +
+                        ") AS q2 USING (workId) " +
+                        "GROUP BY q1.invoiceId";
 
         resultLists = measureQueryTimeSQL(invoicePriceSQL, iterations);
 
         for (String databaseVersion : resultLists.keySet()) {
 
-            if(databaseVersion.contains("MariaDB")) {
+            if (databaseVersion.contains("MariaDB")) {
                 logger.debug("Results for MariaDB version " + databaseVersion);
-            }
-            else {
+            } else {
                 logger.debug("Results for MySQL version " + databaseVersion);
             }
 
@@ -510,10 +503,10 @@ public class QueryTester {
         logger.trace("");
 
         String invoicePriceCypher = "MATCH (inv:invoice)-[:WORK_INVOICE]->(w:work) " +
-        "WITH inv, w " +
-        "OPTIONAL MATCH (wt:worktype)-[h:WORKHOURS]->(w:work)-[u:USED_ITEM]->(i:item) " +
-        "WITH inv, w, SUM((h.hours*h.discount*wt.price)+(u.amount*u.discount*i.purchaseprice)) as workPrice " +
-        "RETURN inv, SUM(workPrice) as invoicePrice";
+                "WITH inv, w " +
+                "OPTIONAL MATCH (wt:worktype)-[h:WORKHOURS]->(w:work)-[u:USED_ITEM]->(i:item) " +
+                "WITH inv, w, SUM((h.hours*h.discount*wt.price)+(u.amount*u.discount*i.purchaseprice)) as workPrice " +
+                "RETURN inv, SUM(workPrice) as invoicePrice";
 
         results = measureQueryTimeCypher(invoicePriceCypher, iterations);
 
@@ -525,24 +518,23 @@ public class QueryTester {
 
         String invoicePriceCypher3 =
                 "MATCH (inv:invoice) " +
-                "CALL { " +
-                "WITH inv " +
-                "MATCH (inv)-[:WORK_INVOICE]->(w:work) " +
-                "RETURN w" +
-                "} " +
-                "CALL { " +
-                "WITH w " +
-                "MATCH (wt:worktype)-[h:WORKHOURS]->(w)-[u:USED_ITEM]->(i:item) " +
-                "RETURN SUM((h.hours*h.discount*wt.price)+(u.amount*u.discount*i.purchaseprice)) as workPrice " +
-                "} " +
-                "RETURN inv, SUM(workPrice) as invoicePrice";
+                        "CALL { " +
+                        "WITH inv " +
+                        "MATCH (inv)-[:WORK_INVOICE]->(w:work) " +
+                        "RETURN w" +
+                        "} " +
+                        "CALL { " +
+                        "WITH w " +
+                        "MATCH (wt:worktype)-[h:WORKHOURS]->(w)-[u:USED_ITEM]->(i:item) " +
+                        "RETURN SUM((h.hours*h.discount*wt.price)+(u.amount*u.discount*i.purchaseprice)) as workPrice " +
+                        "} " +
+                        "RETURN inv, SUM(workPrice) as invoicePrice";
 
         results = measureQueryTimeCypher(invoicePriceCypher3, iterations);
 
         showResults(results, showAll);
 
     }
-
 
 
     public void executeCyclicQueryTestSQL(int iterations, boolean showAll, int invoiceId) {
@@ -562,10 +554,9 @@ public class QueryTester {
 
         for (String databaseVersion : resultLists.keySet()) {
 
-            if(databaseVersion.contains("MariaDB")) {
+            if (databaseVersion.contains("MariaDB")) {
                 logger.debug("Results for MariaDB version " + databaseVersion);
-            }
-            else {
+            } else {
                 logger.debug("Results for MySQL version " + databaseVersion);
             }
 
@@ -627,7 +618,7 @@ public class QueryTester {
 
         for (String databaseVersion : resultLists.keySet()) {
 
-            if(databaseVersion.contains("MariaDB")) {
+            if (databaseVersion.contains("MariaDB")) {
                 logger.debug("Results for MariaDB version " + databaseVersion);
             }
 
@@ -640,4 +631,9 @@ public class QueryTester {
 
     }
 
+    public static org.neo4j.driver.Driver getNeo4jDriver(final String neo4j_db_url, final AuthToken authToken) {
+        // https://neo4j.com/docs/api/java-driver/current/org.neo4j.driver/org/neo4j/driver/Logging.html
+        final var config = Config.builder().withLogging(Logging.none()).build();
+        return GraphDatabase.driver(neo4j_db_url, authToken, config);
+    }
 }
