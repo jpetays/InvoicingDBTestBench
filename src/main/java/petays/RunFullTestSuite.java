@@ -28,8 +28,8 @@ public class RunFullTestSuite {
 
         logger.debug("NO INDEXES");
 
-        queryTester.executeQueryTestsSQL(Param.iterations, Param.showAll);
-        queryTester.executeQueryTestsCypher(Param.iterations, Param.showAll);
+        queryTester.executeQueryTestsSQL(Param.iterations, Param.showAll, null);
+        queryTester.executeQueryTestsCypher(Param.iterations, Param.showAll, null);
 
         logger.trace("");
         logger.debug("CREATING INDEXES");
@@ -37,8 +37,8 @@ public class RunFullTestSuite {
 
         dataGenerator.createIndexes();
 
-        queryTester.executeQueryTestsSQL(Param.iterations, Param.showAll);
-        queryTester.executeQueryTestsCypher(Param.iterations, Param.showAll);
+        queryTester.executeQueryTestsSQL(Param.iterations, Param.showAll, null);
+        queryTester.executeQueryTestsCypher(Param.iterations, Param.showAll, null);
 
 
         logger.trace("");
@@ -47,8 +47,8 @@ public class RunFullTestSuite {
 
         dataGenerator.deleteIndexes();
 
-        queryTester.executeComplexQueryTestSQL(Param.iterations, Param.showAll);
-        queryTester.executeComplexQueryTestCypher(Param.iterations, Param.showAll);
+        queryTester.executeComplexQueryTestSQL(Param.iterations, Param.showAll, null);
+        queryTester.executeComplexQueryTestCypher(Param.iterations, Param.showAll, null);
 
         logger.trace("");
         logger.debug("CREATING INDEXES");
@@ -56,8 +56,8 @@ public class RunFullTestSuite {
 
         dataGenerator.createIndexes();
 
-        queryTester.executeComplexQueryTestSQL(Param.iterations, Param.showAll);
-        queryTester.executeComplexQueryTestCypher(Param.iterations, Param.showAll);
+        queryTester.executeComplexQueryTestSQL(Param.iterations, Param.showAll, null);
+        queryTester.executeComplexQueryTestCypher(Param.iterations, Param.showAll, null);
 
         logger.trace("");
         logger.debug("DELETING INDEXES");
@@ -71,8 +71,8 @@ public class RunFullTestSuite {
         Config.sql_databases.remove(Config.mysql_db_url);
 
 
-        queryTester.executeQueryWithDefinedKeySQL(Param.iterations, Param.showAll);
-        queryTester.executeQueryWithDefinedKeyCypher(Param.iterations, Param.showAll);
+        queryTester.executeQueryWithDefinedKeySQL(Param.iterations, Param.showAll, null);
+        queryTester.executeQueryWithDefinedKeyCypher(Param.iterations, Param.showAll, null);
 
         logger.trace("");
         logger.debug("CREATING INDEXES");
@@ -80,8 +80,8 @@ public class RunFullTestSuite {
 
         dataGenerator.createIndexes();
 
-        queryTester.executeQueryWithDefinedKeySQL(Param.iterations, Param.showAll);
-        queryTester.executeQueryWithDefinedKeyCypher(Param.iterations, Param.showAll);
+        queryTester.executeQueryWithDefinedKeySQL(Param.iterations, Param.showAll, null);
+        queryTester.executeQueryWithDefinedKeyCypher(Param.iterations, Param.showAll, null);
 
         logger.trace("");
         logger.debug("DELETING INDEXES");
@@ -94,8 +94,8 @@ public class RunFullTestSuite {
         int invoiceIndex = customerInvoice.get("invoiceIndex");
         int customerIndex = customerInvoice.get("customerIndex");
 
-        queryTester.executeRecursiveQueryTestSQL(Param.iterations, Param.showAll, invoiceIndex);
-        queryTester.executeRecursiveQueryTestCypher(Param.iterations, Param.showAll, invoiceIndex);
+        queryTester.executeRecursiveQueryTestSQL(Param.iterations, Param.showAll, invoiceIndex, null);
+        queryTester.executeRecursiveQueryTestCypher(Param.iterations, Param.showAll, invoiceIndex, null);
 
         logger.debug("customerIndex " + customerIndex);
         dataGenerator.cleanSequentialInvoices(customerIndex);
@@ -104,8 +104,8 @@ public class RunFullTestSuite {
 
         invoiceIndex = customerInvoice.get("invoiceIndex");
 
-        queryTester.executeRecursiveQueryTestSQL(Param.iterations, Param.showAll, invoiceIndex);
-        queryTester.executeRecursiveQueryTestCypher(Param.iterations, Param.showAll, invoiceIndex);
+        queryTester.executeRecursiveQueryTestSQL(Param.iterations, Param.showAll, invoiceIndex, null);
+        queryTester.executeRecursiveQueryTestCypher(Param.iterations, Param.showAll, invoiceIndex, null);
 
         dataGenerator.cleanSequentialInvoices(customerIndex);
 
@@ -120,8 +120,8 @@ public class RunFullTestSuite {
         invoiceIndex = customerInvoice.get("invoiceIndex");
         customerIndex = customerInvoice.get("customerIndex");
 
-        queryTester.executeRecursiveQueryTestSQL(Param.iterations, Param.showAll, invoiceIndex);
-        queryTester.executeRecursiveQueryTestCypher(Param.iterations, Param.showAll, invoiceIndex);
+        queryTester.executeRecursiveQueryTestSQL(Param.iterations, Param.showAll, invoiceIndex, null);
+        queryTester.executeRecursiveQueryTestCypher(Param.iterations, Param.showAll, invoiceIndex, null);
 
         logger.debug("customerIndex " + customerIndex);
         dataGenerator.cleanSequentialInvoices(customerIndex);
@@ -130,8 +130,8 @@ public class RunFullTestSuite {
 
         invoiceIndex = customerInvoice.get("invoiceIndex");
 
-        queryTester.executeRecursiveQueryTestSQL(Param.iterations, Param.showAll, invoiceIndex);
-        queryTester.executeRecursiveQueryTestCypher(Param.iterations, Param.showAll, invoiceIndex);
+        queryTester.executeRecursiveQueryTestSQL(Param.iterations, Param.showAll, invoiceIndex, null);
+        queryTester.executeRecursiveQueryTestCypher(Param.iterations, Param.showAll, invoiceIndex, null);
 
         dataGenerator.cleanSequentialInvoices(customerIndex);
 

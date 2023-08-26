@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import org.neo4j.driver.*;
 import org.neo4j.driver.Record;
+import petays.RunQueryTests;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -21,9 +22,11 @@ public class QueryTester {
 
     private HashMap<String, String> neo4j_settings;
 
-    private HashMap<String, ArrayList<Long>> resultLists;
+    //private HashMap<String, ArrayList<Long>> resultLists;
 
-    private List<Long> results;
+    //private List<Long> results;
+
+    private Logger dataLogger;
 
     public QueryTester(HashMap<String, String[]> sql_databases, HashMap<String, String> neo4j_settings) {
         this.sql_databases = sql_databases;
@@ -224,8 +227,9 @@ public class QueryTester {
         return Math.sqrt(standardDeviation / size);
     }
 
-    public void executeQueryTestsSQL(int iterations, boolean showAll) {
+    public void executeQueryTestsSQL(int iterations, boolean showAll, Logger dataLogger) {
 
+        setDataLogger(dataLogger, "test.sqlLogger");
         logger.debug("*");
         logger.debug("Short query, work price");
 
@@ -239,7 +243,7 @@ public class QueryTester {
                         "INNER JOIN worktype ON worktype.id = workhours.worktypeId " +
                         "GROUP BY work.id";
 
-        resultLists = measureQueryTimeSQL(workPriceSQL, iterations);
+        var resultLists = measureQueryTimeSQL(workPriceSQL, iterations);
 
         for (String databaseVersion : resultLists.keySet()) {
 
@@ -249,7 +253,7 @@ public class QueryTester {
                 logger.debug("Results for MySQL version " + databaseVersion);
             }
 
-            results = resultLists.get(databaseVersion);
+            final var results = resultLists.get(databaseVersion);
             showResults(results, showAll);
 
         }
@@ -280,7 +284,7 @@ public class QueryTester {
                 logger.debug("Results for MySQL version " + databaseVersion);
             }
 
-            results = resultLists.get(databaseVersion);
+            final var results = resultLists.get(databaseVersion);
             showResults(results, showAll);
 
         }
@@ -299,15 +303,16 @@ public class QueryTester {
                 logger.debug("Results for MySQL version " + databaseVersion);
             }
 
-            results = resultLists.get(databaseVersion);
+            final var results = resultLists.get(databaseVersion);
             showResults(results, showAll);
 
         }
 
     }
 
-    public void executeQueryWithDefinedKeySQL(int iterations, boolean showAll) {
+    public void executeQueryWithDefinedKeySQL(int iterations, boolean showAll, Logger dataLogger) {
 
+        setDataLogger(dataLogger, "test.sqlLogger");
         logger.debug("*");
         logger.debug("Query with defined key, invoice prices for customerId 0");
 
@@ -317,7 +322,7 @@ public class QueryTester {
                 "( SELECT workhours.workid AS workId, SUM( (worktype.price * workhours.hours * workhours.discount) + (item.purchaseprice * useditem.amount * useditem.discount) ) AS price FROM workhours INNER JOIN worktype ON workhours.worktypeid = worktype.id INNER JOIN useditem ON workhours.workid = useditem.workid INNER JOIN item ON useditem.itemid = item.id GROUP BY workhours.workid ) " +
                 "AS q3 USING (workId) WHERE q1.customerId=0 GROUP BY q2.invoiceId";
 
-        resultLists = measureQueryTimeSQL(invoicePricesForCustomerSQL, iterations);
+        final var resultLists = measureQueryTimeSQL(invoicePricesForCustomerSQL, iterations);
 
         for (String databaseVersion : resultLists.keySet()) {
 
@@ -327,15 +332,16 @@ public class QueryTester {
                 logger.debug("Results for MySQL version " + databaseVersion);
             }
 
-            results = resultLists.get(databaseVersion);
+            final var results = resultLists.get(databaseVersion);
             showResults(results, showAll);
 
         }
 
     }
 
-    public void executeQueryWithDefinedKeyCypher(int iterations, boolean showAll) {
+    public void executeQueryWithDefinedKeyCypher(int iterations, boolean showAll, Logger dataLogger) {
 
+        setDataLogger(dataLogger, "test.cypherLogger");
         logger.debug("*");
         logger.debug("Query with defined key, invoice prices for customerId 0");
 
@@ -347,7 +353,7 @@ public class QueryTester {
                 "WITH c, inv, w, SUM((h.hours*h.discount*wt.price)+(u.amount*u.discount*i.purchaseprice)) as workPrice " +
                 "RETURN c, inv, SUM(workPrice) as invoicePrice";
 
-        results = measureQueryTimeCypher(invoicePricesForCustomerCypher, iterations);
+        var results = measureQueryTimeCypher(invoicePricesForCustomerCypher, iterations);
 
         showResults(results, showAll);
 
@@ -386,14 +392,15 @@ public class QueryTester {
 
     }
 
-    public void executeQueryTestsCypher(int iterations, boolean showAll) {
+    public void executeQueryTestsCypher(int iterations, boolean showAll, Logger dataLogger) {
 
+        setDataLogger(dataLogger, "test.cypherLogger");
         logger.debug("*");
         logger.debug("Short query1, work price");
 
         String workPriceCypher = "MATCH (wt:worktype)-[h:WORKHOURS]->(w:work) WITH SUM(h.hours*h.discount*wt.price) as price, w RETURN w.workId as workId, price;";
 
-        results = measureQueryTimeCypher(workPriceCypher, iterations);
+        var results = measureQueryTimeCypher(workPriceCypher, iterations);
 
         showResults(results, showAll);
 
@@ -450,8 +457,9 @@ public class QueryTester {
 
     }
 
-    public void executeComplexQueryTestSQL(int iterations, boolean showAll) {
+    public void executeComplexQueryTestSQL(int iterations, boolean showAll, Logger dataLogger) {
 
+        setDataLogger(dataLogger, "test.sqlLogger");
         logger.debug("*");
         logger.debug("Complex query, invoice price");
 
@@ -476,7 +484,7 @@ public class QueryTester {
                         ") AS q2 USING (workId) " +
                         "GROUP BY q1.invoiceId";
 
-        resultLists = measureQueryTimeSQL(invoicePriceSQL, iterations);
+        final var resultLists = measureQueryTimeSQL(invoicePriceSQL, iterations);
 
         for (String databaseVersion : resultLists.keySet()) {
 
@@ -486,7 +494,7 @@ public class QueryTester {
                 logger.debug("Results for MySQL version " + databaseVersion);
             }
 
-            results = resultLists.get(databaseVersion);
+            final var results = resultLists.get(databaseVersion);
             showResults(results, showAll);
 
         }
@@ -495,8 +503,9 @@ public class QueryTester {
 
     }
 
-    public void executeComplexQueryTestCypher(int iterations, boolean showAll) {
+    public void executeComplexQueryTestCypher(int iterations, boolean showAll, Logger dataLogger) {
 
+        setDataLogger(dataLogger, "test.cypherLogger");
         logger.debug("*");
         logger.debug("Complex query, invoice price");
 
@@ -508,7 +517,7 @@ public class QueryTester {
                 "WITH inv, w, SUM((h.hours*h.discount*wt.price)+(u.amount*u.discount*i.purchaseprice)) as workPrice " +
                 "RETURN inv, SUM(workPrice) as invoicePrice";
 
-        results = measureQueryTimeCypher(invoicePriceCypher, iterations);
+        var results = measureQueryTimeCypher(invoicePriceCypher, iterations);
 
         showResults(results, showAll);
 
@@ -550,7 +559,7 @@ public class QueryTester {
                 "WHERE find_in_set(previousinvoice, @pv) " +
                 "AND length(@pv := concat(@pv, ',', id))";
 
-        resultLists = measureQueryTimeSQL(previousInvoicesSQL, iterations);
+        final var resultLists = measureQueryTimeSQL(previousInvoicesSQL, iterations);
 
         for (String databaseVersion : resultLists.keySet()) {
 
@@ -560,15 +569,16 @@ public class QueryTester {
                 logger.debug("Results for MySQL version " + databaseVersion);
             }
 
-            results = resultLists.get(databaseVersion);
+            final var results = resultLists.get(databaseVersion);
             showResults(results, showAll);
 
         }
 
     }
 
-    public void executeRecursiveQueryTestCypher(int iterations, boolean showAll, int invoiceId) {
+    public void executeRecursiveQueryTestCypher(int iterations, boolean showAll, int invoiceId, Logger dataLogger) {
 
+        setDataLogger(dataLogger, "test.cypherLogger");
         logger.debug("*");
         logger.debug("Executing recursive query test");
 
@@ -576,7 +586,7 @@ public class QueryTester {
 
         String previousInvoicesCypher = "MATCH (i:invoice { invoiceId:" + invoiceId + " })-[p:PREVIOUS_INVOICE *0..]->(j:invoice) RETURN *";
 
-        results = measureQueryTimeCypher(previousInvoicesCypher, iterations);
+        var results = measureQueryTimeCypher(previousInvoicesCypher, iterations);
 
         showResults(results, showAll);
 
@@ -593,8 +603,9 @@ public class QueryTester {
 
     }
 
-    public void executeRecursiveQueryTestSQL(int iterations, boolean showAll, int invoiceId) {
+    public void executeRecursiveQueryTestSQL(int iterations, boolean showAll, int invoiceId, Logger dataLogger) {
 
+        setDataLogger(dataLogger, "test.sqlLogger");
         logger.debug("*");
         logger.debug("Executing recursive query test for optimized queries");
 
@@ -616,7 +627,7 @@ public class QueryTester {
 
         this.sql_databases.remove("jdbc:mysql://127.0.0.1:3307/");
 
-        resultLists = measureQueryTimeSQL(previousInvoicesCTESQL, iterations);
+        final var resultLists = measureQueryTimeSQL(previousInvoicesCTESQL, iterations);
 
         for (String databaseVersion : resultLists.keySet()) {
 
@@ -624,13 +635,17 @@ public class QueryTester {
                 logger.debug("Results for MariaDB version " + databaseVersion);
             }
 
-            results = resultLists.get(databaseVersion);
+            final var results = resultLists.get(databaseVersion);
             showResults(results, showAll);
 
         }
 
         this.sql_databases = (HashMap<String, String[]>) tempSql_databases.clone();
 
+    }
+
+    private void setDataLogger(Logger dataLogger, String defaultLoggerName){
+        this.dataLogger = dataLogger!=null?dataLogger:LoggerFactory.getLogger(defaultLoggerName);
     }
 
     public static org.neo4j.driver.Driver getNeo4jDriver(final String neo4j_db_url, final AuthToken authToken) {

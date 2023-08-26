@@ -66,8 +66,8 @@ public class Main
 
         logger.debug("NO INDEXES");
 
-        queryTester.executeQueryTestsSQL(12, true);
-        queryTester.executeQueryTestsCypher(12, true);
+        queryTester.executeQueryTestsSQL(12, true, null);
+        queryTester.executeQueryTestsCypher(12, true, null);
 
         logger.trace("");
         logger.debug("CREATING INDEXES");
@@ -75,8 +75,8 @@ public class Main
 
         dataGenerator.createIndexes();
 
-        queryTester.executeQueryTestsSQL(12, true);
-        queryTester.executeQueryTestsCypher(12, true);
+        queryTester.executeQueryTestsSQL(12, true, null);
+        queryTester.executeQueryTestsCypher(12, true, null);
 
 
         logger.trace("");
@@ -85,8 +85,8 @@ public class Main
 
         dataGenerator.deleteIndexes();
 
-        queryTester.executeComplexQueryTestSQL(12, true);
-        queryTester.executeComplexQueryTestCypher(12, true);
+        queryTester.executeComplexQueryTestSQL(12, true, null);
+        queryTester.executeComplexQueryTestCypher(12, true, null);
 
         logger.trace("");
         logger.debug("CREATING INDEXES");
@@ -94,8 +94,8 @@ public class Main
 
         dataGenerator.createIndexes();
 
-        queryTester.executeComplexQueryTestSQL(12, true);
-        queryTester.executeComplexQueryTestCypher(12, true);
+        queryTester.executeComplexQueryTestSQL(12, true, null);
+        queryTester.executeComplexQueryTestCypher(12, true, null);
 
         logger.trace("");
         logger.debug("DELETING INDEXES");
@@ -109,8 +109,8 @@ public class Main
         sql_databases.remove("jdbc:mysql://127.0.0.1:3307/");
 
 
-        queryTester.executeQueryWithDefinedKeySQL(12, true);
-        queryTester.executeQueryWithDefinedKeyCypher(12, true);
+        queryTester.executeQueryWithDefinedKeySQL(12, true, null);
+        queryTester.executeQueryWithDefinedKeyCypher(12, true, null);
 
         logger.trace("");
         logger.debug("CREATING INDEXES");
@@ -118,8 +118,8 @@ public class Main
 
         dataGenerator.createIndexes();
 
-        queryTester.executeQueryWithDefinedKeySQL(12, true);
-        queryTester.executeQueryWithDefinedKeyCypher(12, true);
+        queryTester.executeQueryWithDefinedKeySQL(12, true, null);
+        queryTester.executeQueryWithDefinedKeyCypher(12, true, null);
 
         logger.trace("");
         logger.debug("DELETING INDEXES");
@@ -132,8 +132,8 @@ public class Main
         int invoiceIndex = customerInvoice.get("invoiceIndex");
         int customerIndex = customerInvoice.get("customerIndex");
 
-        queryTester.executeRecursiveQueryTestSQL(12, true, invoiceIndex);
-        queryTester.executeRecursiveQueryTestCypher(12, true, invoiceIndex);
+        queryTester.executeRecursiveQueryTestSQL(12, true, invoiceIndex, null);
+        queryTester.executeRecursiveQueryTestCypher(12, true, invoiceIndex, null);
 
         logger.debug("customerIndex " + customerIndex);
         dataGenerator.cleanSequentialInvoices(customerIndex);
@@ -142,8 +142,8 @@ public class Main
 
         invoiceIndex = customerInvoice.get("invoiceIndex");
 
-        queryTester.executeRecursiveQueryTestSQL(12, true, invoiceIndex);
-        queryTester.executeRecursiveQueryTestCypher(12, true, invoiceIndex);
+        queryTester.executeRecursiveQueryTestSQL(12, true, invoiceIndex, null);
+        queryTester.executeRecursiveQueryTestCypher(12, true, invoiceIndex, null);
 
         dataGenerator.cleanSequentialInvoices(customerIndex);
 
@@ -158,8 +158,8 @@ public class Main
         invoiceIndex = customerInvoice.get("invoiceIndex");
         customerIndex = customerInvoice.get("customerIndex");
 
-        queryTester.executeRecursiveQueryTestSQL(12, true, invoiceIndex);
-        queryTester.executeRecursiveQueryTestCypher(12, true, invoiceIndex);
+        queryTester.executeRecursiveQueryTestSQL(12, true, invoiceIndex, null);
+        queryTester.executeRecursiveQueryTestCypher(12, true, invoiceIndex, null);
 
         logger.debug("customerIndex " + customerIndex);
         dataGenerator.cleanSequentialInvoices(customerIndex);
@@ -168,8 +168,8 @@ public class Main
 
         invoiceIndex = customerInvoice.get("invoiceIndex");
 
-        queryTester.executeRecursiveQueryTestSQL(12, true, invoiceIndex);
-        queryTester.executeRecursiveQueryTestCypher(12, true, invoiceIndex);
+        queryTester.executeRecursiveQueryTestSQL(12, true, invoiceIndex, null);
+        queryTester.executeRecursiveQueryTestCypher(12, true, invoiceIndex, null);
         
         dataGenerator.cleanSequentialInvoices(customerIndex);
 

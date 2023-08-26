@@ -11,6 +11,8 @@ public class RunQueryTests {
 
     private static final Logger logger = LoggerFactory.getLogger(RunQueryTests.class);
 
+    public static boolean isOnlyShortTests = true;
+
     public static void main(String[] args) {
 
         final QueryTester queryTester = new QueryTester(Config.sql_databases, Config.neo4j_settings);
@@ -24,17 +26,22 @@ public class RunQueryTests {
         Param.sequentialInvoices_100 = 10;
         Param.sequentialInvoices_1000 = 100;
 
+        final Logger sqlLogger = LoggerFactory.getLogger("test.sqlLogger");
+        final Logger cypherLogger = LoggerFactory.getLogger("test.cypherLogger");
+
         logger.info("Simple query tests");
-        queryTester.executeQueryTestsSQL(Param.iterations, Param.showAll);
-        queryTester.executeQueryTestsCypher(Param.iterations, Param.showAll);
+        queryTester.executeQueryTestsSQL(Param.iterations, Param.showAll, sqlLogger);
+        queryTester.executeQueryTestsCypher(Param.iterations, Param.showAll, cypherLogger);
+
+        logger.info("Query with defined key tests - no MySQL");
+        queryTester.executeQueryWithDefinedKeySQL(Param.iterations, Param.showAll, sqlLogger);
+        queryTester.executeQueryWithDefinedKeyCypher(Param.iterations, Param.showAll, cypherLogger);
+
+        if (isOnlyShortTests) return;
 
         logger.info("Complex query tests");
-        queryTester.executeComplexQueryTestSQL(Param.iterations, Param.showAll);
-        queryTester.executeComplexQueryTestCypher(Param.iterations, Param.showAll);
-
-        logger.info("Complex query tests - no MySQL");
-        queryTester.executeQueryWithDefinedKeySQL(Param.iterations, Param.showAll);
-        queryTester.executeQueryWithDefinedKeyCypher(Param.iterations, Param.showAll);
+        queryTester.executeComplexQueryTestSQL(Param.iterations, Param.showAll, sqlLogger);
+        queryTester.executeComplexQueryTestCypher(Param.iterations, Param.showAll, cypherLogger);
 
         final int[] sequentialInvoices = new int[]{Param.sequentialInvoices_100, Param.sequentialInvoices_1000};
         logger.info("Sequential Invoices tests #{}", sequentialInvoices.length);
@@ -50,8 +57,8 @@ public class RunQueryTests {
             final int invoiceIndex = customerInvoice.get("invoiceIndex");
 
             logger.info("Recursive query tests {}, customerIndex {}, invoiceIndex {}", sequentialInvoice, customerIndex, invoiceIndex);
-            queryTester.executeRecursiveQueryTestSQL(Param.iterations, Param.showAll, invoiceIndex);
-            queryTester.executeRecursiveQueryTestCypher(Param.iterations, Param.showAll, invoiceIndex);
+            queryTester.executeRecursiveQueryTestSQL(Param.iterations, Param.showAll, invoiceIndex, sqlLogger);
+            queryTester.executeRecursiveQueryTestCypher(Param.iterations, Param.showAll, invoiceIndex, cypherLogger);
 
             logger.debug("Delete Sequential Invoices: {}, customerIndex {}", sequentialInvoice, customerIndex);
             dataGenerator.cleanSequentialInvoices(customerIndex);
