@@ -15,8 +15,24 @@
               append="false">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %c{2} - %msg%n"/>
         </File>
+        <File name="SqlDataFile"
+              fileName="${LOG_DIR}/${LOG_NAME}_sql.log"
+              append="false">
+            <PatternLayout pattern="%msg%n"/>
+        </File>
+        <File name="CypherDataFile"
+              fileName="${LOG_DIR}/${LOG_NAME}_cypher.log"
+              append="false">
+            <PatternLayout pattern="%msg%n"/>
+        </File>
     </Appenders>
     <Loggers>
+        <Logger name="test.sqlLogger" level="debug" additivity="false">
+            <AppenderRef ref="SqlDataFile"/>
+        </Logger>
+        <Logger name="test.cypherLogger" level="debug" additivity="false">
+            <AppenderRef ref="CypherDataFile"/>
+        </Logger>
         <Logger name="homebeach" level="debug" additivity="false">
             <AppenderRef ref="Console"/>
             <AppenderRef ref="File"/>

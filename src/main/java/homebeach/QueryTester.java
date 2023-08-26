@@ -67,7 +67,7 @@ public class QueryTester {
 
                 results = new ArrayList<Long>();
 
-                ResultSet resultSet = null;
+                int rowCount = 0;
 
                 for (int i = 0; i < iterations; i++) {
 
@@ -75,7 +75,8 @@ public class QueryTester {
 
                     long startTimeInMilliseconds = System.currentTimeMillis();
 
-                    resultSet = stmt.executeQuery(sqlQuery);
+                    final var resultSet = stmt.executeQuery(sqlQuery);
+                    rowCount = logQueryResult(i, resultSet, sqlQuery);
 
                     long endTimeInMilliseconds = System.currentTimeMillis();
                     long elapsedTimeMilliseconds = endTimeInMilliseconds - startTimeInMilliseconds;
@@ -86,16 +87,12 @@ public class QueryTester {
 
                 resultLists.put(productVersion, results);
 
-                if (resultSet != null) {
-                    resultSet.last();
-                    logger.debug("SQL Query returned " + resultSet.getRow() + " rows.");
-                } else {
-                    logger.debug("SQL Query returned 0 rows.");
-                }
+                logger.debug("SQL Query returned " + rowCount + " rows.");
             }
 
         } catch (Exception e) {
             logger.error("unhandled exception", e);
+            throw new RuntimeException(e);
         } finally {
 
             try {
@@ -130,7 +127,7 @@ public class QueryTester {
 
         List<Long> results = new ArrayList<Long>();
 
-        Result result = null;
+        int rowCount = 0;
 
         logger.debug("Executing Cypher Query: " + cypherQuery + " with " + iterations + " iterations.");
 
@@ -140,7 +137,8 @@ public class QueryTester {
 
             long startTimeInMilliseconds = System.currentTimeMillis();
 
-            result = session.run(cypherQuery);
+            final var result = session.run(cypherQuery);
+            rowCount = logQueryResult(i, result, cypherQuery);
 
             long endTimeInMilliseconds = System.currentTimeMillis();
             long elapsedTimeMilliseconds = endTimeInMilliseconds - startTimeInMilliseconds;
@@ -149,12 +147,7 @@ public class QueryTester {
 
         }
 
-        if (result != null) {
-            List<Record> records = result.list();
-            logger.debug("Cypher query returned: " + records.size() + " records.");
-        } else {
-            logger.debug("Cypher query returned: 0 records.");
-        }
+        logger.debug("Cypher query returned: " + rowCount + " records.");
         session.close();
         driver.close();
 
@@ -185,29 +178,33 @@ public class QueryTester {
             logger.trace("");
         }
 
-        String prefix = "Contents of the query timings table[" + results.size() + "]: ";
+        String prefix = "Query timings[" + results.size() + "]: ";
         StringJoiner joiner = new StringJoiner(", ", prefix, "");
-        for (int i = 0; i < results.size(); i++) {
-
-            if (showAll) {
-                joiner.add(results.get(i).toString());
-            }
-            sum = sum + results.get(i);
+        for (Long result : results) {
+            joiner.add(result.toString());
+            sum = sum + result;
         }
-
         long average = sum / results.size();
-
         int standardDeviation = (int) (calculateStandardDeviation(results) + 0.5);
 
-        if (showAll) {
-            logger.debug(joiner.toString());
-            logger.trace("");
-        }
-
-        logger.debug("Average time for query: {} ms, standard deviation: {}", average, standardDeviation);
+        logger.debug("{}. Standard deviation {} (ms) and average time for query {}", joiner, standardDeviation, formatDurationMs(average));
         logger.trace("");
 
 
+    }
+
+    private static String formatDurationMs(final long elapsedTimeMs) {
+        if (elapsedTimeMs < 1000) {
+            return String.format("%d", elapsedTimeMs) + " ms";
+        }
+        final var elapsedTimeSec = elapsedTimeMs / 1000.0;
+        if (elapsedTimeSec < 60.0) {
+            return String.format("%.1f", elapsedTimeSec) + " s";
+        }
+        if (elapsedTimeSec < 3600.0) {
+            return String.format("%.1f", elapsedTimeSec / 60.0) + " m";
+        }
+        return String.format("%.1f", elapsedTimeSec / 3600.0) + " h";
     }
 
     public static double calculateStandardDeviation(List<Long> results) {
@@ -644,8 +641,78 @@ public class QueryTester {
 
     }
 
-    private void setDataLogger(Logger dataLogger, String defaultLoggerName){
-        this.dataLogger = dataLogger!=null?dataLogger:LoggerFactory.getLogger(defaultLoggerName);
+    private void setDataLogger(Logger dataLogger, String defaultLoggerName) {
+        this.dataLogger = dataLogger != null ? dataLogger : LoggerFactory.getLogger(defaultLoggerName);
+    }
+
+    private static final int logRowCount = 10;
+    private static final int maxIterations = 1;
+
+    private int logQueryResult(final int iteration, final ResultSet resultSet, final String query) throws SQLException {
+        if (iteration >= maxIterations) {
+            resultSet.last();
+            return resultSet.getRow();
+        }
+        dataLogger.debug("query:\t{}", query);
+        // Used Statement is TYPE_FORWARD_ONLY and CONCUR_READ_ONLY
+        final var metaData = resultSet.getMetaData();
+        final var columnCount = metaData.getColumnCount();
+        {
+            final var joiner = new StringJoiner("\t", "", "");
+            for (var i = 1; i <= columnCount; ++i) {
+                joiner.add(metaData.getColumnName(i));
+            }
+            dataLogger.debug("{}:\t{}", 0, joiner);
+        }
+        var rowCount = 0;
+        while (resultSet.next()) {
+            if (resultSet.isLast()) {
+                // At end.
+                break;
+            }
+            final var joiner = new StringJoiner("\t", "", "");
+            for (var col = 1; col <= columnCount; ++col) {
+                joiner.add(resultSet.getObject(col).toString());
+            }
+            dataLogger.debug("{}:\t{}", ++rowCount, joiner);
+            if (rowCount == logRowCount) {
+                // Skip to end.
+                resultSet.last();
+                break;
+            }
+        }
+        rowCount = resultSet.getRow();
+        dataLogger.debug("{}\trows", rowCount);
+        return rowCount;
+    }
+
+    private int logQueryResult(final int iteration, final Result result, final String query) {
+        if (iteration >= maxIterations) {
+            return result.list().size();
+        }
+        dataLogger.debug("query:\t{}", query);
+        final var records = result.list();
+        var columnCount = 0;
+        var rowCount = Math.min(records.size(), logRowCount);
+        for (var i = 0; i < rowCount; ++i) {
+            final var record = records.get(i);
+            if (i == 0) {
+                columnCount = record.keys().size();
+                final var joiner = new StringJoiner("\t", "", "");
+                for (var col = 0; col < columnCount; ++col) {
+                    joiner.add(record.keys().get(col));
+                }
+                dataLogger.debug("{}:\t{}", 0, joiner);
+            }
+            final var joiner = new StringJoiner("\t", "", "");
+            for (var col = 0; col < columnCount; ++col) {
+                joiner.add(record.values().get(col).toString());
+            }
+            dataLogger.debug("{}:\t{}", i + 1, joiner);
+        }
+        rowCount = records.size();
+        dataLogger.debug("{}\trows", rowCount);
+        return rowCount;
     }
 
     public static org.neo4j.driver.Driver getNeo4jDriver(final String neo4j_db_url, final AuthToken authToken) {
