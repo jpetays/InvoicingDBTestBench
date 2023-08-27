@@ -3,17 +3,19 @@
     <Properties>
         <Property name="LOG_DIR">logs</Property>
         <Property name="LOG_NAME">db_testbench</Property>
+        <!-- https://logging.apache.org/log4j/2.x/manual/layouts.html#PatternLayout -->
+        <Property name="CONS_PATTERN">%d{HH:mm:ss.SSS} %-5level %c{1} - %msg%n</Property>
+        <Property name="FILE_PATTERN">%d{HH:mm:ss.SSS} %-5level %c{2} - %msg%n</Property>
     </Properties>
     <Appenders>
-        <!-- https://logging.apache.org/log4j/2.x/manual/layouts.html#PatternLayout -->
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %c{1} - %msg%n"/>
+            <PatternLayout pattern="${CONS_PATTERN}"/>
         </Console>
         <!-- https://logging.apache.org/log4j/2.x/manual/appenders.html#FileAppender -->
         <File name="File"
               fileName="${LOG_DIR}/${LOG_NAME}.log"
               append="false">
-            <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %c{2} - %msg%n"/>
+            <PatternLayout pattern="${FILE_PATTERN}"/>
         </File>
         <File name="SqlDataFile"
               fileName="${LOG_DIR}/${LOG_NAME}_sql.log"
