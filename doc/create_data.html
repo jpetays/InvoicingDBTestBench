@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Invoicing DB</title>
 </head>
 <body>
 <h2 id="create-data">Create data</h2>
@@ -13,6 +13,7 @@
     dataGenerator.insertCustomerData<br>
     dataGenerator.insertSequentialInvoices
 </p>
+<p><i>Note that work, useditem and workhours are missing.</i></p>
 <h4 id="customer">customer</h4>
 <p>DataGeneratorThreadCustomer.java</p>
 <p></p>
@@ -94,5 +95,17 @@
         MATCH (a:invoice),(b:invoice) WHERE a.invoiceId = @(invoiceIndex - 1) AND b.invoiceId = @invoiceIndex <b>CREATE</b> (a)-[m:PREVIOUS_INVOICE]-&gt;(b)</p>
 </blockquote>
 <p>end</p>
+<h3 id="work">invoice</h3>
+<p>DataGeneratorThreadWork.java</p>
+<p></p>
+<blockquote>
+    <p><b>INSERT INTO</b> warehouse.work (id, name) VALUES (?,?)</p>
+</blockquote>
+<blockquote>
+    <p><b>INSERT INTO</b> warehouse.useditem (amount, discount, workId, itemId) VALUES(?,?,?,?)</p>
+</blockquote>
+<blockquote>
+    <p><b>INSERT INTO</b> warehouse.workhours (worktypeId, hours, discount, workId) VALUES(?,?,?,?)</p>
+</blockquote>
 </body>
 </html>
