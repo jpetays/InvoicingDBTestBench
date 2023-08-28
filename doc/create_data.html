@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h2 id="create-data">Create data</h2>
+<p><b>Data is created in following steps</b><br>
+    dataGenerator.loadSampleData<br>
+    dataGenerator.insertItemsAndWorkTypes<br>
+    dataGenerator.insertWorkData<br>
+    dataGenerator.insertCustomerData<br>
+    dataGenerator.insertSequentialInvoices
+</p>
+<h4 id="customer">customer</h4>
+<p>DataGeneratorThreadCustomer.java</p>
+<p></p>
+<blockquote>
+    <p><b>INSERT INTO</b> warehouse.customer (id, name, address) VALUES (@customerIndex, @name, @streetAddress)<br>
+        <b>CREATE</b> (a:customer {customerId: @customerIndex, name: @name, address: @streetAddress})</p>
+</blockquote>
+<h4 id="invoice">invoice</h4>
+<p>if (j &lt; sequentialInvoices) {<br>if (invoiceIndex == firstInvoice) {</p>
+<blockquote>
+    <p><b>INSERT INTO</b> warehouse.invoice (id, customerId, state, duedate, previousinvoice) VALUES (@invoiceIndex, @customerIndex, @state,STR_TO_DATE(&#39;@dueDateAsString&#39;,&#39;%d-%m-%Y&#39;), @invoiceIndex)<br>
+        <b>CREATE</b> (l:invoice {invoiceId: @invoiceIndex, customerId: @customerIndex, state: @state, duedate: date({ year: @year, month: @month, day: @day }), previousinvoice: @invoiceIndex})<br>
+        MATCH (a:customer),(l:invoice) WHERE a.customerId = @customerIndex AND l.invoiceId = @invoiceIndex <b>CREATE</b> (a)-[m:PAYS]-&gt;(l)  </p>
+</blockquote>
+<p>else</p>
+<blockquote>
+    <p><b>INSERT INTO</b> warehouse.invoice (id, customerId, state, duedate, previousinvoice) VALUES (@invoiceIndex, @customerIndex, @state,STR_TO_DATE(&#39;@dueDateAsString&#39;,&#39;%d-%m-%Y&#39;), @(invoiceIndex - 1))<br>
+        <b>CREATE</b> (l:invoice {invoiceId: @invoiceIndex, customerId: @customerIndex, state: @state, duedate: date({ year: @year, month: @month, day: @day }), previousinvoice: @(invoiceIndex - 1)})<br>
+        MATCH (a:customer),(l:invoice) WHERE a.customerId = @customerIndex AND l.invoiceId = @invoiceIndex <b>CREATE</b> (a)-[m:PAYS]-&gt;(l)<br>
+        MATCH (a:invoice),(b:invoice) WHERE a.invoiceId = @(invoiceIndex - 1) AND b.invoiceId = @invoiceIndex <b>CREATE</b> (a)-[m:PREVIOUS_INVOICE]-&gt;(b)  </p>
+</blockquote>
+<p>end else</p>
+<blockquote>
+    <p><b>INSERT INTO</b> warehouse.invoice (id, customerId, state, duedate, previousinvoice) VALUES (@invoiceIndex, @customerIndex, @state,STR_TO_DATE(&#39;@dueDateAsString&#39;,&#39;%d-%m-%Y&#39;), @invoiceIndex)<br>
+        <b>CREATE</b> (l:invoice {invoiceId: @invoiceIndex, customerId: @customerIndex, state: @state, duedate: date({ year: @year, month: @month, day: @day }), previousinvoice: @invoiceIndex})<br>
+        MATCH (a:customer),(l:invoice) WHERE a.customerId = @customerIndex AND l.invoiceId = @invoiceIndex <b>CREATE</b> (a)-[m:PAYS]-&gt;(l)</p>
+</blockquote>
+<p>end</p>
+<h4 id="target">target</h4>
+<blockquote>
+    <p><b>INSERT INTO</b> warehouse.target (id, name, address, customerid) VALUES (@targetIndex, @name, @streetAddress, @customerIndex)<br>
+        <b>CREATE</b> (t:target {targetId: @targetIndex, name: @name, address: @streetAddress, customerid: @customerIndex })<br>
+        MATCH (c:customer),(t:target) WHERE c.customerId = @customerIndex AND t.targetId = @targetIndex <b>CREATE</b> (c)-[ct:CUSTOMER_TARGET]-&gt;(t)</p>
+</blockquote>
+<h4 id="worktarget">worktarget</h4>
+<blockquote>
+    <p><b>INSERT INTO</b> warehouse.worktarget (workId, targetId) VALUES (@workIndex, @targetIndex)<br>
+        MATCH (w:work),(t:target) WHERE w.workId = @workIndex AND t.targetId = @targetIndex <b>CREATE</b> (w)-[wt:WORK_TARGET]-&gt;(t)<br>
+        MATCH (t:target),(w:work) WHERE t.targetId = @targetIndex AND w.workId = @workIndex <b>CREATE</b> (t)-[wt:WORK_TARGET]-&gt;(w)</p>
+</blockquote>
+<h4 id="workinvoice">workinvoice</h4>
+<blockquote>
+    <p><b>INSERT INTO</b> warehouse.workinvoice (workId, invoiceId) VALUES (@workIndex, @invoiceIndex)<br>
+        MATCH (w:work),(i:invoice) WHERE w.workId = @workIndex AND i.invoiceId = @invoiceIndex <b>CREATE</b> (w)-[wi:WORK_INVOICE]-&gt;(i)<br>
+        MATCH (i:invoice),(w:work) WHERE i.invoiceId = @invoiceIndex AND w.workId = @workIndex <b>CREATE</b> (i)-[wi:WORK_INVOICE]-&gt;(w)</p>
+</blockquote>
+<h3 id="item">item</h3>
+<p>DataGeneratorThreadItemsAndWorkTypes.java</p>
+<p></p>
+<blockquote>
+    <p><b>INSERT INTO</b> warehouse.item (id, name, balance, unit, purchaseprice, vat, removed) VALUES (?,?,?,?,?,?,?)<br>
+        <b>CREATE</b> (v:item {itemId: @itemIndex, name: @itemName, balance: @balance, unit:m, purchaseprice: @purchaseprice, vat: @vat, removed: @removed})<br>
+        <b>CREATE</b> (v:item {itemId: @itemIndex, name: @itemName, balance: @balance, unit:pcs, purchaseprice: @purchaseprice, vat: @vat, removed: @removed})</p>
+</blockquote>
+<h3 id="worktype">worktype</h3>
+<blockquote>
+    <p><b>INSERT INTO</b> warehouse.worktype (id, name, price) VALUES (?, ?, ?)<br>
+        <b>CREATE</b> (wt:worktype {worktypeId: @workTypeIndex, name:design, price: @price})<br>
+        <b>CREATE</b> (wt:worktype {worktypeId: @workTypeIndex, name:work, price: @price})<br>
+        <b>CREATE</b> (wt:worktype {worktypeId: @workTypeIndex, name:supporting work, price: @price})</p>
+</blockquote>
+<h3 id="invoice">invoice</h3>
+<p>DataGeneratorThreadSequentialInvoices.java</p>
+<p></p>
+<blockquote>
+    <p><b>INSERT INTO</b> warehouse.invoice (id, customerId, state, duedate, previousinvoice) VALUES (?,?,?,?,?)</p>
+</blockquote>
+<p>if (invoiceIndex == firstInvoiceIndex) {</p>
+<blockquote>
+    <p><b>INSERT INTO</b> warehouse.invoice (id, customerId, state, duedate, previousinvoice) VALUES (@invoiceIndex, @customerIndex, @state,STR_TO_DATE(&#39;@dueDateAsString&#39;,&#39;%d-%m-%Y&#39;), @invoiceIndex)<br>
+        <b>CREATE</b> (l:invoice {invoiceId: @invoiceIndex, customerId: @customerIndex, state: @state, duedate: date({ year: @year, month: @month, day: @day }), previousinvoice: @invoiceIndex})<br>
+        MATCH (a:customer),(l:invoice) WHERE a.customerId = @customerIndex AND l.invoiceId = @invoiceIndex <b>CREATE</b> (a)-[m:PAYS]-&gt;(l)</p>
+</blockquote>
+<p>else</p>
+<blockquote>
+    <p><b>INSERT INTO</b> warehouse.invoice (id, customerId, state, duedate, previousinvoice) VALUES (@invoiceIndex, @customerIndex, @state,STR_TO_DATE(&#39;@dueDateAsString&#39;,&#39;%d-%m-%Y&#39;), @(invoiceIndex - 1))<br>
+        <b>CREATE</b> (l:invoice {invoiceId: @invoiceIndex, customerId: @customerIndex, state: @state, duedate: date({ year: @year, month: @month, day: @day }), previousinvoice: @(invoiceIndex - 1)})<br>
+        MATCH (a:customer),(l:invoice) WHERE a.customerId = @customerIndex AND l.invoiceId = @invoiceIndex <b>CREATE</b> (a)-[m:PAYS]-&gt;(l)<br>
+        MATCH (a:invoice),(b:invoice) WHERE a.invoiceId = @(invoiceIndex - 1) AND b.invoiceId = @invoiceIndex <b>CREATE</b> (a)-[m:PREVIOUS_INVOICE]-&gt;(b)</p>
+</blockquote>
+<p>end</p>
+</body>
+</html>
